@@ -4,7 +4,7 @@ import { ApiResponse } from "../utils/ApiResponse.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
 import jwt from "jsonwebtoken";
 
-const addAccessAndRefreshToken = async (userId) => {
+const generateAndStoreTokens = async (userId) => {
   try {
     const admin = await Admin.findById(userId);
     const accessToken = admin.generateAccessToken();
@@ -40,10 +40,10 @@ const login = asyncHandler(async (req, res) => {
     throw new ApiError(400, "Password is incorrect!!");
   }
   const { accessToken, refreshToken } = await addAccessAndRefreshToken(
-    user._id
+    admin._id
   );
 
-  const loggedInAdmin = await Admin.findById(user._id).select(
+  const loggedInAdmin = await Admin.findById(admin._id).select(
     "-password -refreshToken"
   );
   const options = {
@@ -70,17 +70,17 @@ const login = asyncHandler(async (req, res) => {
 });
 
 const logout = asyncHandler(async (req, res) => {
-  await Admin.findByIdAndUpdate(
-    {
-      $unset: {
-        refreshToken: 1,
-      },
-    },
-    {
-      new: true,
-    }
-  );
-
+    await Admin.findByIdAndUpdate(
+        req.admin._id,
+        {
+            $unset: { 
+                refreshToken: 1,
+            }
+        },
+        {
+            new: true,
+        }
+    )
   const options = {
     httpOnly: true,
     secure: true,
@@ -107,7 +107,7 @@ const accessRefreshToken = asyncHandler(async(req, res)=> {
             process.env.REFRESH_TOKEN_SECRET,
         )
 
-        const admin = Admin.findById(decodedToken._id)
+        const admin = await Admin.findById(decodedToken._id)
 
         if (!admin) {
             throw new ApiError(401, "Invalid Refresh Token!")
@@ -122,7 +122,7 @@ const accessRefreshToken = asyncHandler(async(req, res)=> {
             secure: true,
         }
 
-        const {accessToken, refreshToken} = await addAccessAndRefreshToken(user._id)
+        const {accessToken, refreshToken} = await generateAndStoreTokens(admin._id)
 
         return res
         .status(200)
@@ -153,7 +153,7 @@ const getCurrentAdmin = asyncHandler(async (req, res)=> {
     .json(
         new ApiResponse(
             200,
-            req.user,
+            req.admin,
             "User Fetched Successfully."
         )
     );
@@ -164,4 +164,5 @@ export {
     logout,
     accessRefreshToken,
     getCurrentAdmin,
+    generateAndStoreTokens,
 };
