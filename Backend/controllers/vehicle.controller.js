@@ -40,7 +40,7 @@ const checkInVehicle = asyncHandler(async (req, res) => {
     .json(new ApiResponse(201, vehicle, "Vehicle checked in successfully."));
 });
 
-const checkOutVechicle = asyncHandler(async (req, res) => {
+const checkOutVehicle = asyncHandler(async (req, res) => {
   const { rfNumber } = req.body;
 
   if (!rfNumber) {
@@ -68,5 +68,5 @@ const checkOutVechicle = asyncHandler(async (req, res) => {
 });
 export {
     checkInVehicle, 
-    checkOutVechicle,
+    checkOutVehicle,
 };
