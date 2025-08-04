@@ -5,15 +5,15 @@ import {
     getCurrentAdmin,
     accessRefreshToken,
 } from "../controllers/auth.controller.js";
-import { veryifyJWT } from "../middlewares/auth.middleware.js";
+import { verifyJWT } from "../middlewares/auth.middleware.js";
 
 
 const router = Router();
 
 router.route("/login").post(login);
-router.route("/logout").post(veryifyJWT, logout);
+router.route("/logout").post(verifyJWT, logout);
 router.route("/refresh-token").post(accessRefreshToken);
-router.route("/me").get(veryifyJWT, getCurrentAdmin);
+router.route("/me").get(verifyJWT, getCurrentAdmin);
 
 
 

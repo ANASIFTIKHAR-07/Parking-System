@@ -39,13 +39,11 @@ const login = asyncHandler(async (req, res) => {
   if (!isPasswordValid) {
     throw new ApiError(400, "Password is incorrect!!");
   }
-  const { accessToken, refreshToken } = await addAccessAndRefreshToken(
-    admin._id
-  );
+  const { accessToken, refreshToken } = await generateAndStoreTokens(admin._id);
 
-  const loggedInAdmin = await Admin.findById(admin._id).select(
-    "-password -refreshToken"
-  );
+  const loggedInAdmin = await Admin.findById(admin._id)
+    .select("-password -refreshToken")
+    .lean();
   const options = {
     httpOnly: true,
     secure: false,
@@ -62,7 +60,7 @@ const login = asyncHandler(async (req, res) => {
         {
           accessToken,
           refreshToken,
-          loggedInUser,
+          loggedInAdmin,
         },
         "User logged In Successfully"
       )
@@ -70,17 +68,17 @@ const login = asyncHandler(async (req, res) => {
 });
 
 const logout = asyncHandler(async (req, res) => {
-    await Admin.findByIdAndUpdate(
-        req.admin._id,
-        {
-            $unset: { 
-                refreshToken: 1,
-            }
-        },
-        {
-            new: true,
-        }
-    )
+  await Admin.findByIdAndUpdate(
+    req.admin._id,
+    {
+      $unset: {
+        refreshToken: 1,
+      },
+    },
+    {
+      new: true,
+    }
+  );
   const options = {
     httpOnly: true,
     secure: true,
@@ -93,76 +91,72 @@ const logout = asyncHandler(async (req, res) => {
     .json(new ApiResponse(200, {}, "User Logged out successfully"));
 });
 
+const accessRefreshToken = asyncHandler(async (req, res) => {
+  const incomingRefreshToken =
+    req.cookies.refreshToken || req.body.refreshToken;
 
-const accessRefreshToken = asyncHandler(async(req, res)=> {
-    const incomingRefreshToken = req.cookies.refreshToken || req.body.refreshToken;
+  if (!incomingRefreshToken) {
+    throw new ApiError(401, "Unauthorized Request ! ");
+  }
 
-    if (!incomingRefreshToken) {
-        throw new ApiError(401, "Unauthorized Request ! ")
+  try {
+    const decodedToken = jwt.verify(
+      incomingRefreshToken,
+      process.env.REFRESH_TOKEN_SECRET
+    );
+
+    const admin = await Admin.findById(decodedToken._id);
+
+    if (!admin) {
+      throw new ApiError(401, "Invalid Refresh Token!");
     }
 
-    try {
-        const decodedToken = jwt.verify(
-            incomingRefreshToken,
-            process.env.REFRESH_TOKEN_SECRET,
-        )
-
-        const admin = await Admin.findById(decodedToken._id)
-
-        if (!admin) {
-            throw new ApiError(401, "Invalid Refresh Token!")
-        }
-
-        if (incomingRefreshToken !== admin?.refreshToken) {
-            throw new ApiError(401, "Refresh Token is expired or used.")
-        }
-
-        const options = {
-            httpOnly: true,
-            secure: true,
-        }
-
-        const {accessToken, refreshToken} = await generateAndStoreTokens(admin._id)
-
-        return res
-        .status(200)
-        .cookie("accessToken", accessToken, options )
-        .cookie("refreshToken", refreshToken, options)
-        .json(
-            new ApiResponse(
-                200,
-                {
-                    accessToken,
-                    refreshToken: refreshToken,
-                },
-                "Access Token is refreshed successfully"
-            )
-        )
-    } catch (error) {
-        throw new ApiError(401, error?.message || "Invalide Refresh Token!")
+    if (incomingRefreshToken !== admin?.refreshToken) {
+      throw new ApiError(401, "Refresh Token is expired or used.");
     }
-})
 
-const getCurrentAdmin = asyncHandler(async (req, res)=> {
-    if(!req.admin){
-        throw new ApiError(404, "Admin not found!");
-    }
+    const options = {
+      httpOnly: true,
+      secure: true,
+    };
+
+    const { accessToken, refreshToken } = await generateAndStoreTokens(
+      admin._id
+    );
 
     return res
-    .status(200)
-    .json(
+      .status(200)
+      .cookie("accessToken", accessToken, options)
+      .cookie("refreshToken", refreshToken, options)
+      .json(
         new ApiResponse(
-            200,
-            req.admin,
-            "User Fetched Successfully."
+          200,
+          {
+            accessToken,
+            refreshToken: refreshToken,
+          },
+          "Access Token is refreshed successfully"
         )
-    );
+      );
+  } catch (error) {
+    throw new ApiError(401, error?.message || "Invalide Refresh Token!");
+  }
+});
+
+const getCurrentAdmin = asyncHandler(async (req, res) => {
+  if (!req.admin) {
+    throw new ApiError(404, "Admin not found!");
+  }
+
+  return res
+    .status(200)
+    .json(new ApiResponse(200, req.admin, "User Fetched Successfully."));
 });
 
 export {
-    login,
-    logout,
-    accessRefreshToken,
-    getCurrentAdmin,
-    generateAndStoreTokens,
+  login,
+  logout,
+  accessRefreshToken,
+  getCurrentAdmin,
+  generateAndStoreTokens,
 };
