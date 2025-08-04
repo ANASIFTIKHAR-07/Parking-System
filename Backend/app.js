@@ -20,4 +20,13 @@ app.use(urlencoded({limit: "16kb", extended: true}));
 app.use(json({limit: "16kb"}));
 
 
+
+
+//  Routes Imports And Declaration
+
+import adminRouter from "./routes/admin.routes.js";
+
+app.use("/api/v1/auth", adminRouter);
+
+
 export { app }
