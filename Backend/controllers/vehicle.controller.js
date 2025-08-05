@@ -20,11 +20,11 @@ const checkInVehicle = asyncHandler(async (req, res) => {
   const freeSlot = await ParkingSlot.findOne({ isOccupied: false, floor });
 
   if (!freeSlot) {
-    throw new ApiError(401, "No free slot available on this floor.");
+    throw new ApiError(404, "No free slot available on this floor.");
   }
 
   freeSlot.isOccupied = true;
-  freeSlot.save();
+  await freeSlot.save();
 
   const vehicle = await Vehicle.create({
     plateNumber,
