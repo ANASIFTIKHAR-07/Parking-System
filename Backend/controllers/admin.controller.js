@@ -35,3 +35,64 @@ const addCompany = asyncHandler(async(req, res) => {
         new ApiResponse(200, company, "Company Created Successfully")
     )
 })
+
+
+const getAllCompanies = asyncHandler(async(req, res)=> {
+    const companies = await Company.find()
+    .sort({createdAt: -1})
+
+    return res
+    .status(200)
+    .json(
+        new ApiResponse(200, companies, "All Companies Fetched.")
+    )
+})
+
+
+const updateCompany = asyncHandler(async(req, res)=> {
+
+    const updates = req.body;
+
+    const company = await Company.findByIdAndUpdate(
+        {_id: req.params.id},
+        updates,
+        {new: true}
+    ).select("-email -refreshtoken")   
+
+
+    if (!company) {
+        throw new ApiError(404, "Company Not Found.");
+    }
+
+    return res
+    .status(200)
+    .json(
+        new ApiResponse(200, company, "Company Details Updated Successfully.")
+    )
+})
+
+
+const deleteCompany = asyncHandler(async(req, res)=> {
+    const company = await Company.findByIdAndDelete({
+        _id: req.params.id,
+    })
+
+    if (!company) {
+        throw new ApiError(404, "Company Not Found.");
+    }
+
+    return res
+    .status(200)
+    .json(
+        new ApiResponse(200, {}, "Company Deleted Successfully.")
+    )
+})
+
+
+
+export {
+    addCompany,
+    deleteCompany,
+    updateCompany,
+    getAllCompanies,
+}

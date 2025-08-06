@@ -23,12 +23,12 @@ app.use(json({limit: "16kb"}));
 
 
 //  Routes Imports And Declaration
-
-import authRouter from "./routes/auth.routes.js";
 import vehicleRouter from "./routes/vehicle.routes.js"
+import adminRouter from "./routes/auth.routes.js"
+import authRouter from "./routes/auth.routes.js";
 
 app.use("/api/v1/auth", authRouter);
 app.use("/api/v1/vechile", vehicleRouter);
-
+app.use("/api/v1/admin", adminRouter)
 
 export { app }
