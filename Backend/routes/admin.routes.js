@@ -6,6 +6,7 @@ import {
     createFloor, 
     deleteFloor,
     getAllFloors,
+    updateFloor,
 
 } from "../controllers/admin.controller.js";
 import { Router } from "express";
@@ -21,7 +22,7 @@ router.route("/companies/:id").delete(verifyJWT, deleteCompany);
 router.route("/floor").post(verifyJWT, createFloor);
 router.route("/floors").get(verifyJWT, getAllFloors);
 router.route("/floor/:id").delete(verifyJWT, deleteFloor);
-
+router.route("/floor/:id").put(verifyJWT, updateFloor);
 
 export default router;
 

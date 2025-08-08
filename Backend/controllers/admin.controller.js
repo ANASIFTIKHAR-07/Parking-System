@@ -124,6 +124,21 @@ const deleteFloor = asyncHandler(async (req, res) => {
     .json(new ApiResponse(200, {}, "Floor deleted successfully."));
 });
 
+
+const updateFloor = asyncHandler(async(req, res)=> {
+    const updates = req.body;
+    const floor = await Floor.findByIdAndUpdate(req.params.id, updates, {
+        new: true,
+    }).populate("assignedCompany", "name email")
+
+    if (!floor) {
+        throw new ApiError(404, "Floor not found!")
+    }
+
+    return res
+    .status(200)
+    .json(new ApiResponse(200, floor, "Floor updated successfully."));
+})
 export {
   addCompany,
   deleteCompany,
@@ -132,4 +147,5 @@ export {
   createFloor,
   getAllFloors,
   deleteFloor,
+  updateFloor,
 };
