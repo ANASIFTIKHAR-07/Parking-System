@@ -111,8 +111,9 @@ const getAllFloors = asyncHandler(async (req, res) => {
 });
 
 const deleteFloor = asyncHandler(async (req, res) => {
-  const { id } = req.params;
-  const floor = await Floor.findByIdAndDelete(id);
+    const floor = await  Floor.findByIdAndDelete({
+        _id: req.params.id,
+    })
 
   if (!floor) {
     throw new ApiError(404, "Floor not found.");
