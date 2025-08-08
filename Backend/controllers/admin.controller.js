@@ -36,7 +36,6 @@ const addCompany = asyncHandler(async(req, res) => {
     )
 })
 
-
 const getAllCompanies = asyncHandler(async(req, res)=> {
     const companies = await Company.find()
     .sort({createdAt: -1})
@@ -71,7 +70,6 @@ const updateCompany = asyncHandler(async(req, res)=> {
     )
 })
 
-
 const deleteCompany = asyncHandler(async(req, res)=> {
     const company = await Company.findByIdAndDelete({
         _id: req.params.id,
@@ -89,10 +87,38 @@ const deleteCompany = asyncHandler(async(req, res)=> {
 })
 
 
+const createFloor = asyncHandler(async(req, res)=> {
+    const {floorNumber, assignedCompany, totalSlots} = req.body;
+
+    if (!floorNumber || !assignedCompany || !totalSlots) {
+        throw new ApiError(400, "All fields are required!")
+    }
+
+    const existingFloor = await Floor.findOne({
+        floorNumber
+    });
+
+    if (existingFloor) {
+        throw new ApiError(409, "Floor already exist with this number.")
+    }
+
+    const floor = await Floor.create({
+        floorNumber,
+        assignedCompany,
+        totalSlots,
+        availableSlots: totalSlots,
+    });
+
+    return res.status(201).json(
+        new ApiResponse(201, floor, "Floor created successfully.")
+    );
+})
+
 
 export {
     addCompany,
     deleteCompany,
     updateCompany,
     getAllCompanies,
+    createFloor,
 }

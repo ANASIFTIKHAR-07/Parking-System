@@ -8,7 +8,7 @@ const floorSchema = new Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref: "Company",
     },
-    totalSlots: {
+    totalSlots: {   
         type: Number,
     },
     availableSlots: {
