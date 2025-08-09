@@ -214,7 +214,7 @@ const updateParkingSlot = asyncHandler(async(req, res)=> {
     });
     await floor.save();
   }
-
+  
   
   return res
     .status(200)
