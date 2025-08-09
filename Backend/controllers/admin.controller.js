@@ -139,6 +139,40 @@ const updateFloor = asyncHandler(async(req, res)=> {
     .status(200)
     .json(new ApiResponse(200, floor, "Floor updated successfully."));
 })
+
+const createSlot = asyncHandler(async(req, res)=> {
+  const {floorId, slots}= req.body;
+
+
+  if (!floorId || !slots || !Array.isArray(slots) || slots.length === 0) {
+    throw new ApiError(400, "Floor ID and slot numbers are required!")
+  }
+
+  const floor = await Floor.findById(floorId).populate("assignedCompany");
+
+  if (!floor) {
+    throw new ApiError(404, "Floor not found.");
+  }
+
+  const newSlots = slots.map(slotNumber => ({
+    slotNumber,
+    isOccupied: false,
+    floor: floor._id,
+    company: floor.assignedCompany?._id || null
+  }));
+
+  const createdSlots = await ParkingSlot.insertMany(newSlots)
+
+  floor.availableSlots += createdSlots.length;
+  floor.totalSlots += createdSlots.length;
+  await floor.save();
+
+
+  return res
+    .status(201)
+    .json(new ApiResponse(201, createdSlots, "Parking slots created successfully."));
+
+})
 export {
   getAllCompanies,
   deleteCompany,
@@ -148,4 +182,5 @@ export {
   deleteFloor,
   updateFloor,
   addCompany,
+  createSlot,
 };
