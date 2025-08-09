@@ -140,12 +140,12 @@ const updateFloor = asyncHandler(async(req, res)=> {
     .json(new ApiResponse(200, floor, "Floor updated successfully."));
 })
 export {
-  addCompany,
+  getAllCompanies,
   deleteCompany,
   updateCompany,
-  getAllCompanies,
-  createFloor,
   getAllFloors,
+  createFloor,
   deleteFloor,
   updateFloor,
+  addCompany,
 };
