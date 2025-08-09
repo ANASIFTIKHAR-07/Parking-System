@@ -191,7 +191,59 @@ const getParkingSlot = asyncHandler(async(req, res)=> {
     new ApiResponse(200, slots, "Parking slots fetched successfully.")
   )
 })
+
+const updateParkingSlot = asyncHandler(async(req, res)=> {
+  const {isOccupied} = req.body;
+
+  const slot = await ParkingSlot.findByIdAndUpdate(
+    req.params.id,
+    { isOccupied },
+    { new: true }
+  ).populate("floor", "floorNumber")
+   .populate("company", "name");
+
+  if (!slot) {
+    throw new ApiError(404, "Parking slot not found.");
+  }
+
+  const floor = await Floor.findById(slot.floor);
+  if (floor) {
+    floor.availableSlots = await ParkingSlot.countDocuments({
+      floor: floor._id,
+      isOccupied: false
+    });
+    await floor.save();
+  }
+
+  
+  return res
+    .status(200)
+    .json(new ApiResponse(200, slot, "Parking slot updated successfully."));
+});
+
+const deleteParkingSlot = asyncHandler(async(req, res)=> {
+  const slot = await ParkingSlot.findByIdAndDelete(req.params.id);
+
+  if (!slot) {
+    throw new ApiError(404, "Parking slot not found.");
+  }
+
+  const floor = await Floor.findById(slot.floor);
+  if (floor) {
+    floor.totalSlots -= 1;
+    if (!slot.isOccupied) {
+      floor.availableSlots -= 1;
+    }
+    await floor.save();
+  }
+
+  return res
+    .status(200)
+    .json(new ApiResponse(200, {}, "Parking slot deleted successfully."));
+})
 export {
+  updateParkingSlot,
+  deleteParkingSlot, 
   getAllCompanies,
   getParkingSlot, 
   deleteCompany,
