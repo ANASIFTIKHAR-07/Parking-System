@@ -140,7 +140,7 @@ const updateFloor = asyncHandler(async(req, res)=> {
     .json(new ApiResponse(200, floor, "Floor updated successfully."));
 })
 
-const createSlot = asyncHandler(async(req, res)=> {
+const createParkingSlot = asyncHandler(async(req, res)=> {
   const {floorId, slots}= req.body;
 
 
@@ -174,7 +174,7 @@ const createSlot = asyncHandler(async(req, res)=> {
 
 })
 
-const getParkingSlot = asyncHandler(async(req, res)=> {
+const getParkingSlots = asyncHandler(async(req, res)=> {
   const {floorId, companyId, isOccupied} = req.params;
 
   if(floorId) filter.floor = floorId;
@@ -245,7 +245,7 @@ export {
   updateParkingSlot,
   deleteParkingSlot, 
   getAllCompanies,
-  getParkingSlot, 
+  getParkingSlots, 
   deleteCompany,
   updateCompany,
   getAllFloors,
@@ -253,5 +253,5 @@ export {
   deleteFloor,
   updateFloor,
   addCompany,
-  createSlot,
+  createParkingSlot,
 };
