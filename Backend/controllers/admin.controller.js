@@ -173,8 +173,27 @@ const createSlot = asyncHandler(async(req, res)=> {
     .json(new ApiResponse(201, createdSlots, "Parking slots created successfully."));
 
 })
+
+const getParkingSlot = asyncHandler(async(req, res)=> {
+  const {floorId, companyId, isOccupied} = req.params;
+
+  if(floorId) filter.floor = floorId;
+  if(companyId) filter.company = companyId;
+  if(isOccupied !== "undefined") filter.isOccupied = isOccupied === "true";
+
+  const slots = await ParkingSlot.find(filter)
+    .populate("floor", "floorNumber")
+    .populate("company", "name");
+  
+  return res
+  .status(200)
+  .json(
+    new ApiResponse(200, slots, "Parking slots fetched successfully.")
+  )
+})
 export {
   getAllCompanies,
+  getParkingSlot, 
   deleteCompany,
   updateCompany,
   getAllFloors,
