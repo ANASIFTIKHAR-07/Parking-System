@@ -177,6 +177,8 @@ const createParkingSlot = asyncHandler(async(req, res)=> {
 const getParkingSlots = asyncHandler(async(req, res)=> {
   const {floorId, companyId, isOccupied} = req.params;
 
+  const filter = {};
+
   if(floorId) filter.floor = floorId;
   if(companyId) filter.company = companyId;
   if(isOccupied !== "undefined") filter.isOccupied = isOccupied === "true";
@@ -214,7 +216,7 @@ const updateParkingSlot = asyncHandler(async(req, res)=> {
     });
     await floor.save();
   }
-  
+
   
   return res
     .status(200)
