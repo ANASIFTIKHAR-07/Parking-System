@@ -143,12 +143,11 @@ const updateFloor = asyncHandler(async(req, res)=> {
 const createParkingSlot = asyncHandler(async (req, res) => {
   const { floorId, slots } = req.body;
 
-  if (!floorId || !slots || !Array.isArray(slots) || slots.length === 0) {
-    throw new ApiError(400, "Floor ID and slot numbers are required!");
+  if (!floorId || !Array.isArray(slots) || slots.length === 0) {
+    throw new ApiError(400, "floorId and a non-empty slots array are required.");
   }
 
   const floor = await Floor.findById(floorId).populate("assignedCompany");
-
   if (!floor) {
     throw new ApiError(404, "Floor not found.");
   }
@@ -157,7 +156,7 @@ const createParkingSlot = asyncHandler(async (req, res) => {
     slotNumber: slot.slotNumber,
     floor: floor._id,
     company: floor.assignedCompany?._id || null,
-    employee: slot.employee || null
+    employee: slot.employee || null,
   }));
 
   const createdSlots = await ParkingSlot.insertMany(newSlots);
@@ -216,9 +215,10 @@ const deleteParkingSlot = asyncHandler(async (req, res) => {
     throw new ApiError(404, "Parking slot not found.");
   }
 
+  // Decrement slot count on floor
   const floor = await Floor.findById(slot.floor);
   if (floor) {
-    floor.totalSlots -= 1;
+    floor.totalSlots = Math.max(0, floor.totalSlots - 1);
     await floor.save();
   }
 
@@ -228,16 +228,21 @@ const deleteParkingSlot = asyncHandler(async (req, res) => {
 });
 
 export {
-  updateParkingSlot,
-  deleteParkingSlot, 
-  getAllCompanies,
-  getParkingSlots, 
-  deleteCompany,
-  updateCompany,
-  getAllFloors,
-  createFloor,
-  deleteFloor,
-  updateFloor,
+  // Company
   addCompany,
+  getAllCompanies,
+  updateCompany,
+  deleteCompany,
+
+  // Floor
+  createFloor,
+  getAllFloors,
+  updateFloor,
+  deleteFloor,
+
+  // Parking Slot
   createParkingSlot,
+  getParkingSlots,
+  updateParkingSlot,
+  deleteParkingSlot,
 };
