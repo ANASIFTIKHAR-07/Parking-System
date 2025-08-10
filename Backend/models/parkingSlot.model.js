@@ -1,5 +1,3 @@
-import mongoose, { Schema } from "mongoose";
-
 const parkingSlotSchema = new Schema({
     slotNumber: {
         type: String,
@@ -15,10 +13,8 @@ const parkingSlotSchema = new Schema({
         ref: "Company",
     },
     employee: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "Employee", // assuming you'll have an Employee model
-        default: null,
+        name: String,
+        vehicleNumber: String,
+        rfid: String
     }
 }, { timestamps: true });
-
-export const ParkingSlot = mongoose.model("ParkingSlot", parkingSlotSchema);
