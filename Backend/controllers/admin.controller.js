@@ -140,12 +140,11 @@ const updateFloor = asyncHandler(async(req, res)=> {
     .json(new ApiResponse(200, floor, "Floor updated successfully."));
 })
 
-const createParkingSlot = asyncHandler(async(req, res)=> {
-  const {floorId, slots}= req.body;
-
+const createParkingSlot = asyncHandler(async (req, res) => {
+  const { floorId, slots } = req.body;
 
   if (!floorId || !slots || !Array.isArray(slots) || slots.length === 0) {
-    throw new ApiError(400, "Floor ID and slot numbers are required!")
+    throw new ApiError(400, "Floor ID and slot numbers are required!");
   }
 
   const floor = await Floor.findById(floorId).populate("assignedCompany");
@@ -154,76 +153,63 @@ const createParkingSlot = asyncHandler(async(req, res)=> {
     throw new ApiError(404, "Floor not found.");
   }
 
-  const newSlots = slots.map(slotNumber => ({
-    slotNumber,
-    isOccupied: false,
+  const newSlots = slots.map((slot) => ({
+    slotNumber: slot.slotNumber,
     floor: floor._id,
-    company: floor.assignedCompany?._id || null
+    company: floor.assignedCompany?._id || null,
+    employee: slot.employee || null
   }));
 
-  const createdSlots = await ParkingSlot.insertMany(newSlots)
+  const createdSlots = await ParkingSlot.insertMany(newSlots);
 
-  floor.availableSlots += createdSlots.length;
   floor.totalSlots += createdSlots.length;
   await floor.save();
-
 
   return res
     .status(201)
     .json(new ApiResponse(201, createdSlots, "Parking slots created successfully."));
+});
 
-})
-
-const getParkingSlots = asyncHandler(async(req, res)=> {
-  const {floorId, companyId, isOccupied} = req.params;
-
+const getParkingSlots = asyncHandler(async (req, res) => {
+  const { floorId, companyId, assigned } = req.query;
   const filter = {};
 
-  if(floorId) filter.floor = floorId;
-  if(companyId) filter.company = companyId;
-  if(isOccupied !== "undefined") filter.isOccupied = isOccupied === "true";
+  if (floorId) filter.floor = floorId;
+  if (companyId) filter.company = companyId;
+  if (assigned !== undefined) {
+    filter.employee = assigned === "true" ? { $ne: null } : null;
+  }
 
   const slots = await ParkingSlot.find(filter)
     .populate("floor", "floorNumber")
     .populate("company", "name");
-  
-  return res
-  .status(200)
-  .json(
-    new ApiResponse(200, slots, "Parking slots fetched successfully.")
-  )
-})
 
-const updateParkingSlot = asyncHandler(async(req, res)=> {
-  const {isOccupied} = req.body;
+  return res
+    .status(200)
+    .json(new ApiResponse(200, slots, "Parking slots fetched successfully."));
+});
+
+const updateParkingSlot = asyncHandler(async (req, res) => {
+  const { employee } = req.body; // pass null to unassign
 
   const slot = await ParkingSlot.findByIdAndUpdate(
     req.params.id,
-    { isOccupied },
+    { employee },
     { new: true }
-  ).populate("floor", "floorNumber")
-   .populate("company", "name");
+  )
+    .populate("floor", "floorNumber")
+    .populate("company", "name");
 
   if (!slot) {
     throw new ApiError(404, "Parking slot not found.");
   }
 
-  const floor = await Floor.findById(slot.floor);
-  if (floor) {
-    floor.availableSlots = await ParkingSlot.countDocuments({
-      floor: floor._id,
-      isOccupied: false
-    });
-    await floor.save();
-  }
-
-  
   return res
     .status(200)
     .json(new ApiResponse(200, slot, "Parking slot updated successfully."));
 });
 
-const deleteParkingSlot = asyncHandler(async(req, res)=> {
+const deleteParkingSlot = asyncHandler(async (req, res) => {
   const slot = await ParkingSlot.findByIdAndDelete(req.params.id);
 
   if (!slot) {
@@ -233,16 +219,14 @@ const deleteParkingSlot = asyncHandler(async(req, res)=> {
   const floor = await Floor.findById(slot.floor);
   if (floor) {
     floor.totalSlots -= 1;
-    if (!slot.isOccupied) {
-      floor.availableSlots -= 1;
-    }
     await floor.save();
   }
 
   return res
     .status(200)
     .json(new ApiResponse(200, {}, "Parking slot deleted successfully."));
-})
+});
+
 export {
   updateParkingSlot,
   deleteParkingSlot, 
