@@ -1,3 +1,5 @@
+import mongoose, {Schema} from "mongoose";
+
 const parkingSlotSchema = new Schema({
     slotNumber: {
         type: String,
@@ -18,3 +20,10 @@ const parkingSlotSchema = new Schema({
         rfid: String
     }
 }, { timestamps: true });
+
+parkingSlotSchema.index(
+    { floor: 1, slotNumber: 1 },
+    { unique: true }
+  );
+
+export const ParkingSlot = mongoose.model("ParkingSlot", parkingSlotSchema);
