@@ -7,28 +7,29 @@ import {
   deleteFloor,
   getAllFloors,
   updateFloor,
-  createParkingSlots,
+  createParkingSlot,
   getParkingSlots,
   updateParkingSlot,
   deleteParkingSlot,
 } from "../controllers/admin.controller.js";
 import { Router } from "express";
 import { verifyJWT } from "../middlewares/auth.middleware.js";
+import { isAdmin } from "../middlewares/role.middleware.js";
 
 const router = Router();
 
-router.route("/companies").get(verifyJWT, getAllCompanies);
-router.route("/companies").post(verifyJWT, addCompany);
-router.route("/companies/:id").put(verifyJWT, updateCompany);
-router.route("/companies/:id").delete(verifyJWT, deleteCompany);
-router.route("/floor").post(verifyJWT, createFloor);
-router.route("/floors").get(verifyJWT, getAllFloors);
-router.route("/floor/:id").delete(verifyJWT, deleteFloor);
-router.route("/floor/:id").put(verifyJWT, updateFloor);
-router.route("/parking-slots").post(verifyJWT, createParkingSlots);
-router.route("/parking-slots").get(verifyJWT, getParkingSlots);
-router.route("/parking-slot/:id").put(verifyJWT, updateParkingSlot);
-router.route("/parking-slot/:id").delete(verifyJWT, deleteParkingSlot);
+router.route("/companies").get(verifyJWT, isAdmin, getAllCompanies);
+router.route("/companies").post(verifyJWT, isAdmin, addCompany);
+router.route("/companies/:id").put(verifyJWT, isAdmin, updateCompany);
+router.route("/companies/:id").delete(verifyJWT, isAdmin, deleteCompany);
+router.route("/floor").post(verifyJWT, isAdmin, createFloor);
+router.route("/floors").get(verifyJWT, isAdmin, getAllFloors);
+router.route("/floor/:id").delete(verifyJWT, isAdmin, deleteFloor);
+router.route("/floor/:id").put(verifyJWT, isAdmin, updateFloor);
+router.route("/parking-slots").post(verifyJWT, isAdmin, createParkingSlot);
+router.route("/parking-slots").get(verifyJWT, isAdmin, getParkingSlots);
+router.route("/parking-slot/:id").put(verifyJWT, isAdmin, updateParkingSlot);
+router.route("/parking-slot/:id").delete(verifyJWT, isAdmin, deleteParkingSlot);
 
 export default router;
 
