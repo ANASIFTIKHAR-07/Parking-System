@@ -111,9 +111,9 @@ const getAllFloors = asyncHandler(async (req, res) => {
 });
 
 const deleteFloor = asyncHandler(async (req, res) => {
-    const floor = await  Floor.findByIdAndDelete({
-        _id: req.params.id,
-    })
+  const floor = await Floor.findByIdAndDelete({
+    _id: req.params.id,
+  });
 
   if (!floor) {
     throw new ApiError(404, "Floor not found.");
@@ -124,27 +124,29 @@ const deleteFloor = asyncHandler(async (req, res) => {
     .json(new ApiResponse(200, {}, "Floor deleted successfully."));
 });
 
+const updateFloor = asyncHandler(async (req, res) => {
+  const updates = req.body;
+  const floor = await Floor.findByIdAndUpdate(req.params.id, updates, {
+    new: true,
+  }).populate("assignedCompany", "name email");
 
-const updateFloor = asyncHandler(async(req, res)=> {
-    const updates = req.body;
-    const floor = await Floor.findByIdAndUpdate(req.params.id, updates, {
-        new: true,
-    }).populate("assignedCompany", "name email")
+  if (!floor) {
+    throw new ApiError(404, "Floor not found!");
+  }
 
-    if (!floor) {
-        throw new ApiError(404, "Floor not found!")
-    }
-
-    return res
+  return res
     .status(200)
     .json(new ApiResponse(200, floor, "Floor updated successfully."));
-})
+});
 
 const createParkingSlot = asyncHandler(async (req, res) => {
   const { floorId, slots } = req.body;
 
   if (!floorId || !Array.isArray(slots) || slots.length === 0) {
-    throw new ApiError(400, "floorId and a non-empty slots array are required.");
+    throw new ApiError(
+      400,
+      "floorId and a non-empty slots array are required."
+    );
   }
 
   const floor = await Floor.findById(floorId).populate("assignedCompany");
@@ -166,7 +168,9 @@ const createParkingSlot = asyncHandler(async (req, res) => {
 
   return res
     .status(201)
-    .json(new ApiResponse(201, createdSlots, "Parking slots created successfully."));
+    .json(
+      new ApiResponse(201, createdSlots, "Parking slots created successfully.")
+    );
 });
 
 const getParkingSlots = asyncHandler(async (req, res) => {
@@ -191,17 +195,32 @@ const getParkingSlots = asyncHandler(async (req, res) => {
 const updateParkingSlot = asyncHandler(async (req, res) => {
   const { employee } = req.body; // pass null to unassign
 
-  const slot = await ParkingSlot.findByIdAndUpdate(
-    req.params.id,
-    { employee },
-    { new: true }
-  )
+  // 1️⃣ Get current slot without updating
+  const slot = await ParkingSlot.findById(req.params.id)
     .populate("floor", "floorNumber")
     .populate("company", "name");
 
   if (!slot) {
     throw new ApiError(404, "Parking slot not found.");
   }
+
+  // 2️⃣ If trying to assign a new employee, validate
+  if (employee) {
+    // Prevent overwriting without unassigning first
+    if (slot.employee && slot.employee.toString() !== employee) {
+      throw new ApiError(400, "Slot is already occupied. Unassign before reassigning.");
+    }
+
+    // Prevent same employee having multiple slots
+    const existing = await ParkingSlot.findOne({ employee });
+    if (existing && existing._id.toString() !== req.params.id) {
+      throw new ApiError(400, "Employee already has a parking slot.");
+    }
+  }
+
+  // 3️⃣ Perform the actual update
+  slot.employee = employee || null;
+  await slot.save();
 
   return res
     .status(200)
