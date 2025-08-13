@@ -4,6 +4,7 @@ import ApiResponse from "../utils/ApiResponse.js";
 import ParkingLog from "../models/parkingLog.model.js";
 import { Parser } from "json2csv";
 
+
 export const exportParkingLogsCSV = asyncHandler(async (req, res) => {
     const { company, vehicleNumber, floor, slotNumber, employeeName, rfid, startDate, endDate } = req.query;
   
@@ -27,7 +28,7 @@ export const exportParkingLogsCSV = asyncHandler(async (req, res) => {
       .populate("company", "name")
       .populate("floor", "floorNumber")
       .sort({ createdAt: -1 })
-      .lean(); // lean() makes it plain JS object (faster for export)
+      .lean();
   
     if (!logs.length) {
       throw new ApiError(404, "No parking logs found with the given filters.");
@@ -49,8 +50,9 @@ export const exportParkingLogsCSV = asyncHandler(async (req, res) => {
     const json2csvParser = new Parser();
     const csv = json2csvParser.parse(csvData);
   
-    res.header("Content-Type", "text/csv");
-    res.attachment(`parking_logs_${Date.now()}.csv`);
-    return res.send(csv);
+    // Return CSV inside JSON response
+    return res
+      .status(200)
+      .json(new ApiResponse(200, { csv }, "Parking logs exported successfully."));
   });
-
+  
