@@ -256,7 +256,7 @@ const getParkingLogs = asyncHandler(async (req, res) => {
   if (floor) filters.floor = floor;
   if (slotNumber) filters.slotNumber = { $regex: slotNumber, $options: "i" };
   if (employeeName) filters.employeeName = { $regex: employeeName, $options: "i" };
-  if (rfid) filters.rfidTag = rfid; // exact match for RFID
+  if (rfid) filters.rfidTag = rfid; 
 
   // Date range filter
   if (startDate || endDate) {
