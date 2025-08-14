@@ -1,5 +1,6 @@
 import mongoose from "mongoose";
 import { DB_NAME } from "../constants.js";
+import { Admin } from "../models/admin.model.js";
 
 
 const connectDB = async ()=> {
@@ -7,6 +8,14 @@ const connectDB = async ()=> {
         const connectionInstance = await mongoose.connect(`${process.env.MONGODB_URI}/${DB_NAME}`)
         console.log(`\n MongoDB connected !! DB HOST : ${connectionInstance.connection.host}`);
         
+        if (process.env.NODE_ENV !== "production") {
+            const existingAdmin = await Admin.findOne({email: "admin@gmail.com"});
+            if (!existingAdmin) {
+                name: "Muhammad Saleh",
+                email: "admin@gmail.com",
+                
+            }
+        }
     } catch (error) {
         console.error("MongoDB connection Failed!", error); 
         process.exit(1) 
