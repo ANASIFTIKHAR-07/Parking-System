@@ -17,6 +17,9 @@ const connectDB = async ()=> {
                     role: "admin",
                     password: process.env.ADMIN_PASSWORD,
                 });
+                console.log("✅ Admin user seeded successfully.");
+            } else {
+                console.log("ℹ️ Admin already exists, skipping seed.");
             }
         }
     } catch (error) {
