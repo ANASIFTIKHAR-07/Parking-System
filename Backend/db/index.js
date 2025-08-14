@@ -11,9 +11,12 @@ const connectDB = async ()=> {
         if (process.env.NODE_ENV !== "production") {
             const existingAdmin = await Admin.findOne({email: "admin@gmail.com"});
             if (!existingAdmin) {
-                name: "Muhammad Saleh",
-                email: "admin@gmail.com",
-                
+                await Admin.create({
+                    name: "Muhammad Saleh",
+                    email: process.env.ADMIN_EMAIL,
+                    role: "admin",
+                    password: process.env.ADMIN_PASSWORD,
+                });
             }
         }
     } catch (error) {
