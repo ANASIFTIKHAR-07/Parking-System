@@ -1,53 +1,58 @@
-import { Parser } from 'json2csv';
+// controllers/log.controller.js
 import ParkingLog from '../models/ParkingLog.js';
+import { createObjectCsvStringifier } from 'csv-writer';
 
-export const exportParkingLogsCSV = async (req, res) => {
-    try {
-        const { startDate, endDate, company, floor, vehicleType, vehicleNumber } = req.query;
-        const filter = {};
+export const exportParkingLogs = async (req, res) => {
+  try {
+    const { startDate, endDate, companyId, employeeId } = req.query;
+    const filter = {};
 
-        // Date filter (UTC safe)
-        if (startDate || endDate) {
-            filter.checkInTime = {};
-            if (startDate) filter.checkInTime.$gte = new Date(startDate + 'T00:00:00Z');
-            if (endDate) filter.checkInTime.$lte = new Date(endDate + 'T23:59:59Z');
-        }
-
-        if (company) filter.company = company;
-        if (floor) filter.floor = floor;
-        if (vehicleType) filter.vehicleType = vehicleType;
-        if (vehicleNumber) filter.vehicleNumber = { $regex: vehicleNumber, $options: 'i' };
-
-        const logs = await ParkingLog.find(filter)
-            .populate('company', 'name')
-            .populate('floor', 'name')
-            .populate('vehicle', 'vehicleNumber vehicleType')
-            .lean();
-
-        if (!logs.length) {
-            return res.status(404).json({ message: 'No parking logs found' });
-        }
-
-        const csvData = logs.map(log => ({
-            Company: log.company?.name || '',
-            Floor: log.floor?.name || '',
-            VehicleNumber: log.vehicle?.vehicleNumber || '',
-            VehicleType: log.vehicle?.vehicleType || '',
-            CheckInTime: log.checkInTime ? new Date(log.checkInTime).toISOString() : '',
-            CheckOutTime: log.checkOutTime ? new Date(log.checkOutTime).toISOString() : '',
-            DurationMinutes: log.duration || '',
-            Charges: log.charges || '',
-        }));
-
-        const json2csv = new Parser();
-        const csv = json2csv.parse(csvData);
-
-        res.header('Content-Type', 'text/csv');
-        res.attachment(`parking_logs_${Date.now()}.csv`);
-        res.send(csv);
-
-    } catch (error) {
-        console.error(error);
-        res.status(500).json({ message: 'Error exporting CSV' });
+    // Optional date filtering
+    if (startDate || endDate) {
+      filter.checkInTime = {};
+      if (startDate) filter.checkInTime.$gte = new Date(`${startDate}T00:00:00Z`);
+      if (endDate) filter.checkInTime.$lte = new Date(`${endDate}T23:59:59Z`);
     }
+
+    // Optional company filter
+    if (companyId) filter.company = companyId;
+
+    // Optional employee filter
+    if (employeeId) filter.employee = employeeId;
+
+    const logs = await ParkingLog.find(filter)
+      .populate('vehicle', 'plateNumber')
+      .populate('company', 'name')
+      .populate('floor', 'name')
+      .populate('slot', 'slotNumber');
+
+    // CSV setup
+    const csvStringifier = createObjectCsvStringifier({
+      header: [
+        { id: 'plateNumber', title: 'Plate Number' },
+        { id: 'company', title: 'Company' },
+        { id: 'floor', title: 'Floor' },
+        { id: 'slot', title: 'Slot' },
+        { id: 'checkInTime', title: 'Check-in Time' },
+        { id: 'checkOutTime', title: 'Check-out Time' },
+      ],
+    });
+
+    const csvData = logs.map(log => ({
+      plateNumber: log.vehicle?.plateNumber || '',
+      company: log.company?.name || '',
+      floor: log.floor?.name || '',
+      slot: log.slot?.slotNumber || '',
+      checkInTime: log.checkInTime?.toISOString() || '',
+      checkOutTime: log.checkOutTime?.toISOString() || '',
+    }));
+
+    res.setHeader('Content-Type', 'text/csv');
+    res.setHeader('Content-Disposition', 'attachment; filename=parking_logs.csv');
+
+    res.send(csvStringifier.getHeaderString() + csvStringifier.stringifyRecords(csvData));
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: 'Failed to export logs', error: err.message });
+  }
 };
