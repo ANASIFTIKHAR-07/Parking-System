@@ -1,5 +1,6 @@
 import express, { json, urlencoded } from "express"
 import cookieParser from "cookie-parser"
+import helmet from "helmet"
 import cors from "cors"
 
 
@@ -18,6 +19,7 @@ app.use(cors(
 app.use(cookieParser());
 app.use(urlencoded({limit: "16kb", extended: true}));
 app.use(json({limit: "16kb"}));
+app.use(helmet())
 
 
 
