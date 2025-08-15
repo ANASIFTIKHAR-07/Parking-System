@@ -18,13 +18,6 @@ const parkingLogSchema = new Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref: "Floor",
     },
-    checkInTime: {
-        type: Date,
-        required: true,
-    },
-    checkOutTime: {
-        type: Date,
-    },
 },
 {timestamps: true});
 
