@@ -18,6 +18,9 @@ app.use(cors(
     }
 ))
 
+
+app.use(mongoSanitize())
+app.use(xss())
 app.use(cookieParser());
 app.use(urlencoded({limit: "16kb", extended: true}));
 app.use(json({limit: "16kb"}));
