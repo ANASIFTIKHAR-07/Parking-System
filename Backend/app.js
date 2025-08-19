@@ -18,13 +18,15 @@ app.use(cors(
     }
 ))
 
+app.use(helmet())
 
-app.use(mongoSanitize())
+app.use(mongoSanitize({
+    replaceWith: '_'   
+  }))
 app.use(xss())
 app.use(cookieParser());
 app.use(urlencoded({limit: "16kb", extended: true}));
 app.use(json({limit: "16kb"}));
-app.use(helmet())
 
 
 
