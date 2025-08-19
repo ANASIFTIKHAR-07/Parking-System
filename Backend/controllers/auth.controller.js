@@ -140,7 +140,7 @@ const accessRefreshToken = asyncHandler(async (req, res) => {
         )
       );
   } catch (error) {
-    throw new ApiError(401, error?.message || "Invalide Refresh Token!");
+    throw new ApiError(401, error?.message || "Invalid Refresh Token!");
   }
 });
 
