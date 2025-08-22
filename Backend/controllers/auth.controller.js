@@ -6,7 +6,13 @@ import jwt from "jsonwebtoken";
 
 const generateAndStoreTokens = async (userId) => {
   try {
+    console.log("Looking up Admin by ID:", userId);
     const admin = await Admin.findById(userId);
+    console.log("generateAndStoreTokens called with userId:", userId);
+    if (!admin) {
+      throw new ApiError(404, "Admin not found!");
+    }
+
     const accessToken = admin.generateAccessToken();
     const refreshToken = admin.generateRefreshToken();
     admin.refreshToken = refreshToken;
@@ -19,8 +25,6 @@ const generateAndStoreTokens = async (userId) => {
     );
   }
 };
-
-
 
 const login = asyncHandler(async (req, res) => {
   const { email, password } = req.body;
@@ -64,7 +68,7 @@ const login = asyncHandler(async (req, res) => {
           refreshToken,
           loggedInAdmin,
         },
-        "User logged In Successfully"
+        "Admin logged In Successfully"
       )
     );
 });
@@ -83,7 +87,7 @@ const logout = asyncHandler(async (req, res) => {
     }
   );
 
-  if(!req.user || !req.user._id) {
+  if (!req.user || !req.user._id) {
     return res.status(401).json({ message: "Unauthorized, admin not found" });
   }
   const options = {
