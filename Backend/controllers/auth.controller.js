@@ -71,7 +71,8 @@ const login = asyncHandler(async (req, res) => {
 
 const logout = asyncHandler(async (req, res) => {
   await Admin.findByIdAndUpdate(
-    req.admin._id,
+    req.user._id,
+
     {
       $unset: {
         refreshToken: 1,
@@ -81,6 +82,10 @@ const logout = asyncHandler(async (req, res) => {
       new: true,
     }
   );
+
+  if(!req.user || !req.user._id) {
+    return res.status(401).json({ message: "Unauthorized, admin not found" });
+  }
   const options = {
     httpOnly: true,
     secure: true,
