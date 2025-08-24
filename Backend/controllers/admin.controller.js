@@ -7,7 +7,7 @@ import { ParkingSlot } from "../models/parkingSlot.model.js";
 import { ParkingLog } from "../models/parkingLog.model.js";
 
 const addCompany = asyncHandler(async (req, res) => {
-  const { name, email, assignedFloors, phone } = req.body;
+  const { name, email, phone } = req.body;
 
   if (!name || !email || !phone) {
     throw new ApiError(400, "All Fields are required for adding the company!");
@@ -23,7 +23,6 @@ const addCompany = asyncHandler(async (req, res) => {
     name,
     email,
     phone,
-    assignedFloors,
   });
 
   return res
@@ -74,9 +73,9 @@ const deleteCompany = asyncHandler(async (req, res) => {
 });
 
 const createFloor = asyncHandler(async (req, res) => {
-  const { floorNumber, assignedCompany, totalSlots } = req.body;
+  const { floorNumber,  totalSlots } = req.body;
 
-  if (!floorNumber || !assignedCompany || !totalSlots) {
+  if (!floorNumber || !totalSlots) {
     throw new ApiError(400, "All fields are required!");
   }
 
@@ -90,7 +89,6 @@ const createFloor = asyncHandler(async (req, res) => {
 
   const floor = await Floor.create({
     floorNumber,
-    assignedCompany,
     totalSlots,
     availableSlots: totalSlots,
   });
