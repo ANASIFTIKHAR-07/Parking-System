@@ -294,6 +294,10 @@ const assignCompanyToFloor = asyncHandler(async(req, res)=> {
   floor.assignedCompany = companyId;
   await floor.save()
 
+  if (!company.assignedFloors.includes(floorId)) {
+    company.assignedFloors.push(floorId);
+    await Company.save()
+  }
   return res
   .status(200)
   .json(
