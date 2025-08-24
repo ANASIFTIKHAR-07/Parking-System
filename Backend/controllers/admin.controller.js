@@ -275,6 +275,33 @@ const getParkingLogs = asyncHandler(async (req, res) => {
   return res.status(200).json(new ApiResponse(200, logs, "Parking logs retrieved successfully."));
 });
 
+
+const assignCompanyToFloor = asyncHandler(async(req, res)=> {
+  const {companyId, floorId} = req.body;
+
+  const company = await Company.findById(companyId)
+  const floor = await Floor.findById(floorId)
+
+  
+  if (!company) throw new ApiError(404, "Company not found");
+  if (!floor) throw new ApiError(404, "Floor not found");
+
+   // Prevent duplicates
+  if (floor.assignedCompany && floor.assignedCompany.toString() !== companyId) {
+    throw new ApiError(400, "This floor is already assigned to another company");
+  }
+
+  floor.assignedCompany = companyId;
+  await floor.save()
+
+  return res
+  .status(200)
+  .json(
+    new ApiResponse(200, {company, floor}, "Company Assigned to Floor successfully.")
+  )
+
+})
+
 export {
   // Company
   addCompany,
@@ -296,4 +323,7 @@ export {
 
   // Parking Log 
   getParkingLogs,
+
+  // Company Assignment To Floor
+  assignCompanyToFloor,
 };
