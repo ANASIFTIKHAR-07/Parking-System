@@ -296,7 +296,7 @@ const assignCompanyToFloor = asyncHandler(async(req, res)=> {
 
   if (!company.assignedFloors.includes(floorId)) {
     company.assignedFloors.push(floorId);
-    await Company.save()
+    await company.save()
   }
   return res
   .status(200)
