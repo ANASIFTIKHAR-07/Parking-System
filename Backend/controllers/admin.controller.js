@@ -279,8 +279,8 @@ const getParkingLogs = asyncHandler(async (req, res) => {
 const assignCompanyToFloor = asyncHandler(async(req, res)=> {
   const {companyId, floorId} = req.body;
 
-  const company = await Company.findById(companyId)
-  const floor = await Floor.findById(floorId)
+  const company = await Company.findById(companyId).populate("assignedFloors", "floorNumber");
+  const floor = await Floor.findById(floorId).populate("assignedCompany", "name email");
 
   
   if (!company) throw new ApiError(404, "Company not found");
