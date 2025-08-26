@@ -31,7 +31,7 @@ router.route("/floor").post(verifyJWT, isAdmin, createFloor);
 router.route("/floors").get(verifyJWT, isAdmin, getAllFloors);
 router.route("/floor/:id").delete(verifyJWT, isAdmin, deleteFloor);
 router.route("/floor/:id").put(verifyJWT, isAdmin, updateFloor);
-//  Parking Slot Route
+//  Parking Slot Route  
 router.route("/parking-slots").post(verifyJWT, isAdmin, createParkingSlot);
 router.route("/parking-slots").get(verifyJWT, isAdmin, getParkingSlots);
 router.route("/parking-slot/:id").put(verifyJWT, isAdmin, updateParkingSlot);
