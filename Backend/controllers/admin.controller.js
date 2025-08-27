@@ -35,7 +35,7 @@ const getAllCompanies = asyncHandler(async (req, res) => {
 
   return res
     .status(200)
-    .json(new ApiResponse(200, "All Companies Fetched.", companies,));
+    .json(new ApiResponse(200, "All Companies Fetched.", companies));
 });
 
 const updateCompany = asyncHandler(async (req, res) => {
