@@ -27,7 +27,7 @@ const addCompany = asyncHandler(async (req, res) => {
 
   return res
     .status(200)
-    .json(new ApiResponse(200, company, "Company Created Successfully"));
+    .json(new ApiResponse(200, "Company Created Successfully", company,));
 });
 
 const getAllCompanies = asyncHandler(async (req, res) => {
@@ -35,7 +35,7 @@ const getAllCompanies = asyncHandler(async (req, res) => {
 
   return res
     .status(200)
-    .json(new ApiResponse(200, companies, "All Companies Fetched."));
+    .json(new ApiResponse(200, "All Companies Fetched.", companies,));
 });
 
 const updateCompany = asyncHandler(async (req, res) => {
@@ -54,7 +54,7 @@ const updateCompany = asyncHandler(async (req, res) => {
   return res
     .status(200)
     .json(
-      new ApiResponse(200, company, "Company Details Updated Successfully.")
+      new ApiResponse(200, "Company Details Updated Successfully.", company,)
     );
 });
 
@@ -69,7 +69,7 @@ const deleteCompany = asyncHandler(async (req, res) => {
 
   return res
     .status(200)
-    .json(new ApiResponse(200, {}, "Company Deleted Successfully."));
+    .json(new ApiResponse(200, "Company Deleted Successfully.", {}));
 });
 
 const createFloor = asyncHandler(async (req, res) => {
@@ -95,7 +95,7 @@ const createFloor = asyncHandler(async (req, res) => {
 
   return res
     .status(201)
-    .json(new ApiResponse(201, floor, "Floor created successfully."));
+    .json(new ApiResponse(201, "Floor created successfully.", floor));
 });
 
 const getAllFloors = asyncHandler(async (req, res) => {
@@ -105,7 +105,7 @@ const getAllFloors = asyncHandler(async (req, res) => {
 
   return res
     .status(200)
-    .json(new ApiResponse(200, floors, "All floors fetched."));
+    .json(new ApiResponse(200, "All floors fetched.", floors));
 });
 
 const deleteFloor = asyncHandler(async (req, res) => {
@@ -119,7 +119,7 @@ const deleteFloor = asyncHandler(async (req, res) => {
 
   return res
     .status(200)
-    .json(new ApiResponse(200, {}, "Floor deleted successfully."));
+    .json(new ApiResponse(200, "Floor deleted successfully.", {}));
 });
 
 const updateFloor = asyncHandler(async (req, res) => {
@@ -134,7 +134,7 @@ const updateFloor = asyncHandler(async (req, res) => {
 
   return res
     .status(200)
-    .json(new ApiResponse(200, floor, "Floor updated successfully."));
+    .json(new ApiResponse(200, "Floor updated successfully.", floor));
 });
 
 const createParkingSlot = asyncHandler(async (req, res) => {
@@ -167,7 +167,7 @@ const createParkingSlot = asyncHandler(async (req, res) => {
   return res
     .status(201)
     .json(
-      new ApiResponse(201, createdSlots, "Parking slots created successfully.")
+      new ApiResponse(201, "Parking slots created successfully.", createdSlots)
     );
 });
 
@@ -187,7 +187,7 @@ const getParkingSlots = asyncHandler(async (req, res) => {
 
   return res
     .status(200)
-    .json(new ApiResponse(200, slots, "Parking slots fetched successfully."));
+    .json(new ApiResponse(200, "Parking slots fetched successfully.", slots));
 });
 
 const updateParkingSlot = asyncHandler(async (req, res) => {
@@ -225,7 +225,7 @@ const updateParkingSlot = asyncHandler(async (req, res) => {
 
   return res
     .status(200)
-    .json(new ApiResponse(200, slot, "Parking slot updated successfully."));
+    .json(new ApiResponse(200, "Parking slot updated successfully.", slot));
 });
 
 const deleteParkingSlot = asyncHandler(async (req, res) => {
@@ -244,7 +244,7 @@ const deleteParkingSlot = asyncHandler(async (req, res) => {
 
   return res
     .status(200)
-    .json(new ApiResponse(200, {}, "Parking slot deleted successfully."));
+    .json(new ApiResponse(200, "Parking slot deleted successfully.",  {}));
 });
 
 const getParkingLogs = asyncHandler(async (req, res) => {
@@ -288,7 +288,7 @@ const getParkingLogs = asyncHandler(async (req, res) => {
 
   return res
     .status(200)
-    .json(new ApiResponse(200, logs, "Parking logs retrieved successfully."));
+    .json(new ApiResponse(200, "Parking logs retrieved successfully.", logs));
 });
 
 const assignCompanyToFloor = asyncHandler(async (req, res) => {
