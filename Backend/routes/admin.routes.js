@@ -23,9 +23,9 @@ const router = Router();
 //  Company Route
 router.route("/companies").get(verifyJWT, isAdmin, getAllCompanies);
 router.route("/companies").post(verifyJWT, isAdmin, addCompany);
+router.route("/companies/assign-floor").put(verifyJWT, isAdmin, assignCompanyToFloor)
 router.route("/companies/:id").put(verifyJWT, isAdmin, updateCompany);
 router.route("/companies/:id").delete(verifyJWT, isAdmin, deleteCompany);
-router.route("/companies/assign-floor").put(verifyJWT, isAdmin, assignCompanyToFloor)
 //  Floor Route
 router.route("/floor").post(verifyJWT, isAdmin, createFloor);
 router.route("/floors").get(verifyJWT, isAdmin, getAllFloors);

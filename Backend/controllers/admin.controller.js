@@ -73,7 +73,7 @@ const deleteCompany = asyncHandler(async (req, res) => {
 });
 
 const createFloor = asyncHandler(async (req, res) => {
-  const { floorNumber,  totalSlots } = req.body;
+  const { floorNumber, totalSlots } = req.body;
 
   if (!floorNumber || !totalSlots) {
     throw new ApiError(400, "All fields are required!");
@@ -206,7 +206,10 @@ const updateParkingSlot = asyncHandler(async (req, res) => {
   if (employee) {
     // Prevent overwriting without unassigning first
     if (slot.employee && slot.employee.toString() !== employee) {
-      throw new ApiError(400, "Slot is already occupied. Unassign before reassigning.");
+      throw new ApiError(
+        400,
+        "Slot is already occupied. Unassign before reassigning."
+      );
     }
 
     // Prevent same employee having multiple slots
@@ -245,16 +248,27 @@ const deleteParkingSlot = asyncHandler(async (req, res) => {
 });
 
 const getParkingLogs = asyncHandler(async (req, res) => {
-  const { company, vehicleNumber, floor, slotNumber, employeeName, rfid, startDate, endDate } = req.query;
+  const {
+    company,
+    vehicleNumber,
+    floor,
+    slotNumber,
+    employeeName,
+    rfid,
+    startDate,
+    endDate,
+  } = req.query;
 
   let filters = {};
 
   if (company) filters.company = company;
-  if (vehicleNumber) filters.vehicleNumber = { $regex: vehicleNumber, $options: "i" };
+  if (vehicleNumber)
+    filters.vehicleNumber = { $regex: vehicleNumber, $options: "i" };
   if (floor) filters.floor = floor;
   if (slotNumber) filters.slotNumber = { $regex: slotNumber, $options: "i" };
-  if (employeeName) filters.employeeName = { $regex: employeeName, $options: "i" };
-  if (rfid) filters.rfidTag = rfid; 
+  if (employeeName)
+    filters.employeeName = { $regex: employeeName, $options: "i" };
+  if (rfid) filters.rfidTag = rfid;
 
   // Date range filter
   if (startDate || endDate) {
@@ -272,39 +286,50 @@ const getParkingLogs = asyncHandler(async (req, res) => {
     throw new ApiError(404, "No parking logs found with the given filters.");
   }
 
-  return res.status(200).json(new ApiResponse(200, logs, "Parking logs retrieved successfully."));
+  return res
+    .status(200)
+    .json(new ApiResponse(200, logs, "Parking logs retrieved successfully."));
 });
 
+const assignCompanyToFloor = asyncHandler(async (req, res) => {
+  const { companyId, floorId } = req.body;
 
-const assignCompanyToFloor = asyncHandler(async(req, res)=> {
-  const {companyId, floorId} = req.body;
+  const company = await Company.findById(companyId).populate(
+    "assignedFloors",
+    "floorNumber"
+  );
+  const floor = await Floor.findById(floorId).populate(
+    "assignedCompany",
+    "name email"
+  );
 
-  const company = await Company.findById(companyId).populate("assignedFloors", "floorNumber");
-  const floor = await Floor.findById(floorId).populate("assignedCompany", "name email");
-
-  
   if (!company) throw new ApiError(404, "Company not found");
   if (!floor) throw new ApiError(404, "Floor not found");
 
-   // Prevent duplicates
+  // Prevent duplicates
   if (floor.assignedCompany && floor.assignedCompany.toString() !== companyId) {
-    throw new ApiError(400, "This floor is already assigned to another company");
+    throw new ApiError(
+      400,
+      "This floor is already assigned to another company"
+    );
   }
 
   floor.assignedCompany = companyId;
-  await floor.save()
+  await floor.save();
 
   if (!company.assignedFloors.includes(floorId)) {
     company.assignedFloors.push(floorId);
-    await company.save()
+    await company.save();
   }
   return res
-  .status(200)
-  .json(
-    new ApiResponse(200, {company, floor}, "Company Assigned to Floor successfully.")
-  )
-
-})
+    .status(200)
+    .json(
+      new ApiResponse(200, "Company Assigned to Floor successfully.", {
+        company,
+        floor,
+      })
+    );
+});
 
 export {
   // Company
@@ -325,7 +350,7 @@ export {
   updateParkingSlot,
   deleteParkingSlot,
 
-  // Parking Log 
+  // Parking Log
   getParkingLogs,
 
   // Company Assignment To Floor
