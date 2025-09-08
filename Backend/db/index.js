@@ -2,7 +2,7 @@ import mongoose from "mongoose";
 import { DB_NAME } from "../constants.js";
 import { Admin } from "../models/admin.model.js";
 
-
+// I have seeded the admin credentials
 const connectDB = async ()=> {
     try {
         const connectionInstance = await mongoose.connect(`${process.env.MONGODB_URI}/${DB_NAME}`)
