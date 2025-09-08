@@ -165,7 +165,7 @@ const createParkingSlot = asyncHandler(async (req, res) => {
   await floor.save();
 
   return res
-    .status(201)
+    .status(201)  
     .json(
       new ApiResponse(201, "Parking slots created successfully.", createdSlots)
     );
