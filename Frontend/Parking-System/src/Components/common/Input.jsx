@@ -1,5 +1,5 @@
 import React from 'react';
-import './Input.css';
+// Tailwind styles
 
 const Input = ({
   label,
@@ -14,11 +14,11 @@ const Input = ({
   ...props
 }) => {
   return (
-    <div className={`input-group ${className}`}>
+    <div className={`flex w-full flex-col gap-1.5 ${className}`}>
       {label && (
-        <label className="input-label">
+        <label className="text-sm font-medium text-gray-700">
           {label}
-          {required && <span className="required">*</span>}
+          {required && <span className="text-red-500">*</span>}
         </label>
       )}
       <input
@@ -28,10 +28,10 @@ const Input = ({
         onChange={onChange}
         disabled={disabled}
         required={required}
-        className={`input-field ${error ? 'error' : ''}`}
+        className={`rounded-md border ${error ? 'border-red-500 focus:ring-red-500' : 'border-gray-300 focus:ring-blue-500'} bg-white px-3 py-2 text-base shadow-sm placeholder:text-gray-400 focus:outline-none focus:ring-2 disabled:cursor-not-allowed disabled:bg-gray-100`}
         {...props}
       />
-      {error && <span className="error-message">{error}</span>}
+      {error && <span className="text-sm text-red-600">{error}</span>}
     </div>
   );
 };

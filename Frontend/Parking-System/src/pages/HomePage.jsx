@@ -2,7 +2,9 @@ import React from 'react'
 
 const HomePage = () => {
   return (
-    <div>HomePage</div>
+    <div className='rounded-lg border border-gray-200 bg-white p-6 shadow-sm'>
+      HomePage
+    </div>
   )
 }
 
