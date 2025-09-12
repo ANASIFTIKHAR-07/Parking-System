@@ -28,13 +28,13 @@ const vehicleSchema = new Schema({
     type: mongoose.Schema.Types.ObjectId,
     ref: "ParkingSlot",
   },
-  checkInTime: {
-    type: Date,
-    default: Date.now,
-  },
-  checkOutTime: {
-    type: Date,
-  },
+  // checkInTime: {
+  //   type: Date,
+  //   default: Date.now,
+  // },
+  // checkOutTime: {
+  //   type: Date,
+  // },
 });
 
 export const Vehicle = mongoose.model("Vehicle", vehicleSchema);

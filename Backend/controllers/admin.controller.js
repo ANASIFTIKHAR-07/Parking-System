@@ -191,7 +191,7 @@ const getParkingSlots = asyncHandler(async (req, res) => {
 });
 
 const updateParkingSlot = asyncHandler(async (req, res) => {
-  const { employee } = req.body; // pass null to unassign
+  const { employee } = req.body; // pass employee object or null to unassign
 
   // 1️⃣ Get current slot without updating
   const slot = await ParkingSlot.findById(req.params.id)
@@ -204,18 +204,23 @@ const updateParkingSlot = asyncHandler(async (req, res) => {
 
   // 2️⃣ If trying to assign a new employee, validate
   if (employee) {
+    // Validate employee object structure
+    if (!employee.name || !employee.vehicleNumber || !employee.rfid) {
+      throw new ApiError(400, "Employee must have name, vehicleNumber, and rfid.");
+    }
+
     // Prevent overwriting without unassigning first
-    if (slot.employee && slot.employee.toString() !== employee) {
+    if (slot.employee && slot.employee.rfid !== employee.rfid) {
       throw new ApiError(
         400,
         "Slot is already occupied. Unassign before reassigning."
       );
     }
 
-    // Prevent same employee having multiple slots
-    const existing = await ParkingSlot.findOne({ employee });
+    // Prevent same employee (by RFID) having multiple slots
+    const existing = await ParkingSlot.findOne({ "employee.rfid": employee.rfid });
     if (existing && existing._id.toString() !== req.params.id) {
-      throw new ApiError(400, "Employee already has a parking slot.");
+      throw new ApiError(400, "Employee with this RFID already has a parking slot.");
     }
   }
 

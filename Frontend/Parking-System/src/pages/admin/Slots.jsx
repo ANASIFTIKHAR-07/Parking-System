@@ -9,7 +9,7 @@ export default function Slots() {
   const [slots, setSlots] = useState([])
   const [filters, setFilters] = useState({ floorId: '', companyId: '', assigned: '' })
   const [bulk, setBulk] = useState({ floorId: '', start: 1, end: 10 })
-  const [assign, setAssign] = useState({ id: '', employee: '' })
+  const [assign, setAssign] = useState({ id: '', employee: { name: '', vehicleNumber: '', rfid: '' } })
   const [error, setError] = useState('')
 
   const loadMeta = async () => {
@@ -35,7 +35,14 @@ export default function Slots() {
 
   const assignSlot = async (e) => {
     e.preventDefault()
-    try { await updateParkingSlot(assign.id, { employee: assign.employee || null }); setAssign({ id: '', employee: '' }); await loadSlots() } catch (e) { setError(e.message) }
+    try { 
+      const employeeData = assign.employee.name && assign.employee.vehicleNumber && assign.employee.rfid 
+        ? assign.employee 
+        : null
+      await updateParkingSlot(assign.id, { employee: employeeData }); 
+      setAssign({ id: '', employee: { name: '', vehicleNumber: '', rfid: '' } }); 
+      await loadSlots() 
+    } catch (e) { setError(e.message) }
   }
 
   const remove = async (id) => { if (!confirm('Delete slot?')) return; try { await deleteParkingSlot(id); await loadSlots() } catch (e) { setError(e.message) } }
@@ -97,9 +104,9 @@ export default function Slots() {
                 <td className='px-4 py-2'>{s.slotNumber}</td>
                 <td className='px-4 py-2'>Floor {s.floor?.floorNumber}</td>
                 <td className='px-4 py-2'>{s.company?.name || '-'}</td>
-                <td className='px-4 py-2'>{s.employee || '-'}</td>
+                <td className='px-4 py-2'>{s.employee?.name || '-'}</td>
                 <td className='px-4 py-2 text-right'>
-                  <Button variant='outline' className='mr-2' onClick={() => setAssign({ id: s._id, employee: s.employee || '' })}>Assign</Button>
+                  <Button variant='outline' className='mr-2' onClick={() => setAssign({ id: s._id, employee: s.employee || { name: '', vehicleNumber: '', rfid: '' } })}>Assign</Button>
                   <Button variant='danger' onClick={() => remove(s._id)}>Delete</Button>
                 </td>
               </tr>
@@ -112,13 +119,13 @@ export default function Slots() {
       {assign.id && (
         <form onSubmit={assignSlot} className='rounded-lg border bg-white p-4'>
           <div className='mb-2 text-sm font-medium text-gray-700'>Assign/Unassign Employee</div>
-          <div className='grid grid-cols-1 gap-3 md:grid-cols-3'>
-            <Input label='Employee ID (blank to unassign)' value={assign.employee} onChange={e => setAssign(v => ({ ...v, employee: e.target.value }))} />
-            <div className='flex items-end'>
+          <div className='grid grid-cols-1 gap-3 md:grid-cols-4'>
+            <Input label='Employee Name' value={assign.employee.name} onChange={e => setAssign(v => ({ ...v, employee: { ...v.employee, name: e.target.value } }))} />
+            <Input label='Vehicle Number' value={assign.employee.vehicleNumber} onChange={e => setAssign(v => ({ ...v, employee: { ...v.employee, vehicleNumber: e.target.value } }))} />
+            <Input label='RFID' value={assign.employee.rfid} onChange={e => setAssign(v => ({ ...v, employee: { ...v.employee, rfid: e.target.value } }))} />
+            <div className='flex items-end gap-2'>
               <Button type='submit'>Save</Button>
-            </div>
-            <div className='flex items-end'>
-              <Button variant='outline' type='button' onClick={() => setAssign({ id: '', employee: '' })}>Cancel</Button>
+              <Button variant='outline' type='button' onClick={() => setAssign({ id: '', employee: { name: '', vehicleNumber: '', rfid: '' } })}>Cancel</Button>
             </div>
           </div>
         </form>
