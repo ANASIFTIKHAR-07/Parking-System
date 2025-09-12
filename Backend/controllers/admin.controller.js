@@ -45,7 +45,7 @@ const updateCompany = asyncHandler(async (req, res) => {
     { _id: req.params.id },
     updates,
     { new: true }
-  ).select("-email -refreshtoken");
+  ).select("-refreshToken");
 
   if (!company) {
     throw new ApiError(404, "Company Not Found.");

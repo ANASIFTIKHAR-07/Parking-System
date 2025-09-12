@@ -8,6 +8,10 @@ export default function ProtectedRoute() {
 
   if (loading) return <div className='p-6'>Loading...</div>
   if (!admin) return <Navigate to='/login' replace state={{ from: location }} />
+  // RBAC: require role admin where available
+  if (admin?.role && admin.role !== 'ADMIN') {
+    return <Navigate to='/' replace />
+  }
   return <Outlet />
 }
 

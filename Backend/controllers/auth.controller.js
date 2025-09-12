@@ -52,8 +52,8 @@ const login = asyncHandler(async (req, res) => {
     .lean();
   const options = {
     httpOnly: true,
-    secure: false,
-    sameSite: "lax",
+    secure: process.env.NODE_ENV === 'production',
+    sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
   };
 
   return res
@@ -92,7 +92,8 @@ const logout = asyncHandler(async (req, res) => {
   }
   const options = {
     httpOnly: true,
-    secure: true,
+    secure: process.env.NODE_ENV === 'production',
+    sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
   };
 
   return res
@@ -128,7 +129,8 @@ const accessRefreshToken = asyncHandler(async (req, res) => {
 
     const options = {
       httpOnly: true,
-      secure: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
     };
 
     const { accessToken, refreshToken } = await generateAndStoreTokens(
@@ -161,7 +163,7 @@ const getCurrentAdmin = asyncHandler(async (req, res) => {
 
   return res
     .status(200)
-    .json(new ApiResponse(200, req.admin, "User Fetched Successfully."));
+    .json(new ApiResponse(200, req.user, "User Fetched Successfully."));
 });
 
 export {

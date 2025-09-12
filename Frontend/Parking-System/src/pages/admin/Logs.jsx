@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import { fetchCompanies, fetchFloors, fetchParkingLogs } from '../../services/adminApi.js'
 import Button from '../../components/common/Button.jsx'
+import { API_BASE_URL } from '../../services/http.js'
 
 export default function Logs() {
   const [companies, setCompanies] = useState([])
@@ -16,6 +17,12 @@ export default function Logs() {
     try { setLogs(await fetchParkingLogs(filters)) } catch (e) { setError(e.message) }
   }
   useEffect(() => { loadMeta() }, [])
+  const exportCsv = () => {
+    const url = new URL(`${API_BASE_URL}/csv/parking-logs/export`)
+    Object.entries(filters).forEach(([k, v]) => { if (v) url.searchParams.set(k, v) })
+    // Open in same tab to trigger download with credentials
+    window.location.href = url.toString()
+  }
 
   return (
     <div className='space-y-6'>
@@ -38,8 +45,9 @@ export default function Logs() {
           <input type='date' className='rounded-md border border-gray-300 px-3 py-2' value={filters.startDate} onChange={e => setFilters(v => ({ ...v, startDate: e.target.value }))} />
           <input type='date' className='rounded-md border border-gray-300 px-3 py-2' value={filters.endDate} onChange={e => setFilters(v => ({ ...v, endDate: e.target.value }))} />
         </div>
-        <div className='mt-3'>
+        <div className='mt-3 flex gap-2'>
           <Button onClick={load}>Search</Button>
+          <Button variant='outline' onClick={exportCsv}>Export CSV</Button>
         </div>
       </div>
 
