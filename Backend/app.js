@@ -9,6 +9,9 @@ import cors from "cors"
 
 const app = express()
 
+// Trust reverse proxy (e.g., Render, Railway, Nginx) so secure cookies work
+app.set('trust proxy', 1)
+
 app.use(cors(
     {
         origin: process.env.CORS_ORIGIN,

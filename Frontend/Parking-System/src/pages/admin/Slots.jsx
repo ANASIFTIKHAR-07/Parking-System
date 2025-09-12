@@ -44,7 +44,7 @@ export default function Slots() {
     <div className='space-y-6'>
       <h2 className='text-xl font-semibold'>Parking Slots</h2>
 
-      {/* Filters */}
+      {/* Filters */} 
       <div className='rounded-lg border bg-white p-4'>
         <div className='grid grid-cols-1 gap-3 md:grid-cols-4'>
           <select className='rounded-md border border-gray-300 px-3 py-2' value={filters.floorId} onChange={e => setFilters(v => ({ ...v, floorId: e.target.value }))}>
