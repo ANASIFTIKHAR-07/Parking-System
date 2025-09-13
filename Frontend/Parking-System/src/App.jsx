@@ -10,9 +10,7 @@ import ProtectedRoute from './components/routing/ProtectedRoute.jsx'
 import Login from './pages/auth/Login.jsx'
 import { AuthProvider } from './context/AuthContext.jsx'
 
-
 function App() {
-
   return (
     <AuthProvider>
       <BrowserRouter>
