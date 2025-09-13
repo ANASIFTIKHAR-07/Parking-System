@@ -10,7 +10,7 @@ export function AuthProvider({ children }) {
 
   useEffect(() => {
     const checkAuth = async () => {
-      try {
+      try { 
         setLoading(true)
         const me = await auth.me()
         console.log('Auth check successful:', me)
