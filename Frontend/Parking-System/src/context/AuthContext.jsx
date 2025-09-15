@@ -22,7 +22,6 @@ export function AuthProvider({ children }) {
         setLoading(false)
       }
     }
-    
     checkAuth()
   }, [])
 
