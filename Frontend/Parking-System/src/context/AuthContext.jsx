@@ -22,7 +22,7 @@ export function AuthProvider({ children }) {
         setLoading(false)
       }
     }
-    checkAuth()
+    checkAuth();
   }, [])
 
   const login = async (credentials) => {
