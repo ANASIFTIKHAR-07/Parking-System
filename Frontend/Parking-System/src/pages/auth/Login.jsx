@@ -1,59 +1,20 @@
 import React, { useState } from 'react'
-
-// Mock components for demonstration
-const Input = ({ label, type, value, onChange, required, placeholder, className = '' }) => (
-  <div className="relative">
-    <label className="block text-sm font-medium text-gray-700 mb-2">{label}</label>
-    <input
-      type={type}
-      value={value}
-      onChange={onChange}
-      required={required}
-      placeholder={placeholder}
-      className={`w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 bg-white backdrop-blur-sm ${className}`}
-    />
-  </div>
-)
-
-const Button = ({ children, type, disabled, className, onClick }) => (
-  <button
-    type={type}
-    disabled={disabled}
-    onClick={onClick}
-    className={`relative overflow-hidden transition-all duration-300 transform hover:scale-105 active:scale-95 ${className}`}
-  >
-    {children}
-  </button>
-)
-
-const Link = ({ to, children, className }) => (
-  <a href={to} className={className}>{children}</a>
-)
-
-// Mock hooks for demo
-const useNavigate = () => (path, options) => console.log('Navigate to:', path)
-const useLocation = () => ({ state: null })
-const useAuth = () => ({ 
-  login: async (form) => {
-    await new Promise(resolve => setTimeout(resolve, 2000))
-    console.log('Login successful')
-  }, 
-  loading: false 
-})
+import Input from '../../components/common/Input.jsx'
+import Button from '../../components/common/Button.jsx'
+import { useNavigate, useLocation, Link } from 'react-router-dom'
+import useAuth from '../../context/AuthContext.jsx'
 
 export default function Login() {
   const [form, setForm] = useState({ email: '', password: '' })
   const [error, setError] = useState('')
-  const [loading, setLoading] = useState(false)
   const navigate = useNavigate()
   const location = useLocation()
-  const { login } = useAuth()
+  const { login, loading } = useAuth()
 
   const onSubmit = async (e) => {
     e.preventDefault()
     try {
       setError('')
-      setLoading(true)
       console.log('Attempting login with:', form.email)
       await login(form)
       console.log('Login successful, navigating to admin dashboard')
@@ -63,8 +24,6 @@ export default function Login() {
     } catch (e) {
       console.error('Login error:', e)
       setError(e.message)
-    } finally {
-      setLoading(false)
     }
   }
 
@@ -85,8 +44,8 @@ export default function Login() {
 
       <div className='relative z-10 min-h-screen flex items-center justify-center px-4 py-8'>
         <div className='w-full max-w-md'>
-          {/* Header with staggered animation */}
-          <div className='text-center mb-8 animate-pulse'>
+          {/* Header */}
+          <div className='text-center mb-8'>
             <Link to='/' className='inline-flex items-center space-x-3 mb-8 group transition-all duration-300'>
               <div className='w-12 h-12 bg-gradient-to-r from-blue-500 to-purple-600 rounded-2xl flex items-center justify-center shadow-lg transform group-hover:scale-110 group-hover:rotate-12 transition-all duration-300'>
                 <span className='text-white font-bold text-xl'>🅿️</span>
@@ -105,7 +64,7 @@ export default function Login() {
           <div className='backdrop-blur-xl bg-white bg-opacity-10 rounded-3xl shadow-2xl border border-white border-opacity-20 p-8 transform transition-all duration-500 hover:bg-opacity-20'>
             {/* Error Message */}
             {error && (
-              <div className='mb-6 p-4 bg-red-500 bg-opacity-20 border border-red-400 border-opacity-50 rounded-2xl flex items-center space-x-3 animate-pulse'>
+              <div className='mb-6 p-4 bg-red-500 bg-opacity-20 border border-red-400 border-opacity-50 rounded-2xl flex items-center space-x-3'>
                 <svg className='w-5 h-5 text-red-300 flex-shrink-0' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
                   <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z' />
                 </svg>
@@ -114,28 +73,28 @@ export default function Login() {
             )}
 
             {/* Form */}
-            <div className='space-y-6'>
+            <form className='space-y-6' onSubmit={onSubmit}>
               <div className='space-y-5'>
                 <div className="transform hover:scale-105 transition-all duration-200">
-                  <label className="block text-sm font-medium text-white mb-2">Email Address</label>
-                  <input
-                    type="email"
-                    value={form.email}
-                    onChange={e => setForm(v => ({ ...v, email: e.target.value }))}
-                    required
-                    placeholder="admin@example.com"
-                    className="w-full px-4 py-3 border border-gray-300 border-opacity-30 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 bg-white bg-opacity-80 backdrop-blur-sm text-gray-900 placeholder-gray-500"
+                  <Input 
+                    label='Email Address' 
+                    type='email' 
+                    value={form.email} 
+                    onChange={e => setForm(v => ({ ...v, email: e.target.value }))} 
+                    required 
+                    placeholder='admin@example.com'
+                    className="[&>input]:bg-white [&>input]:bg-opacity-90 [&>input]:backdrop-blur-sm [&>input]:border-white [&>input]:border-opacity-30 [&>input]:rounded-xl [&>input]:transition-all [&>input]:duration-200 [&>label]:text-white [&>label]:font-medium"
                   />
                 </div>
                 <div className="transform hover:scale-105 transition-all duration-200">
-                  <label className="block text-sm font-medium text-white mb-2">Password</label>
-                  <input
-                    type="password"
-                    value={form.password}
-                    onChange={e => setForm(v => ({ ...v, password: e.target.value }))}
-                    required
-                    placeholder="Enter your password"
-                    className="w-full px-4 py-3 border border-gray-300 border-opacity-30 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 bg-white bg-opacity-80 backdrop-blur-sm text-gray-900 placeholder-gray-500"
+                  <Input 
+                    label='Password' 
+                    type='password' 
+                    value={form.password} 
+                    onChange={e => setForm(v => ({ ...v, password: e.target.value }))} 
+                    required 
+                    placeholder='Enter your password'
+                    className="[&>input]:bg-white [&>input]:bg-opacity-90 [&>input]:backdrop-blur-sm [&>input]:border-white [&>input]:border-opacity-30 [&>input]:rounded-xl [&>input]:transition-all [&>input]:duration-200 [&>label]:text-white [&>label]:font-medium"
                   />
                 </div>
               </div>
@@ -144,8 +103,8 @@ export default function Login() {
               <Button 
                 type='submit' 
                 disabled={loading}
-                onClick={onSubmit}
-                className='w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white py-4 rounded-2xl font-semibold shadow-xl hover:shadow-2xl disabled:opacity-70 disabled:cursor-not-allowed group'
+                className='w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white py-4 rounded-2xl font-semibold shadow-xl hover:shadow-2xl transform hover:scale-105 transition-all duration-300 border-0'
+                size="large"
               >
                 {loading ? (
                   <div className='flex items-center justify-center space-x-3'>
@@ -161,7 +120,7 @@ export default function Login() {
                   </div>
                 )}
               </Button>
-            </div>
+            </form>
 
             {/* Back to Home Link */}
             <div className='mt-8 text-center'>
@@ -182,7 +141,7 @@ export default function Login() {
           </div>
 
           {/* Footer */}
-          <div className="mt-8 text-center opacity-0 animate-pulse" style={{ animationDelay: '0.4s' }}>
+          <div className="mt-8 text-center">
             <p className="text-blue-100 opacity-60 text-xs">
               Secure • Fast • Reliable
             </p>
