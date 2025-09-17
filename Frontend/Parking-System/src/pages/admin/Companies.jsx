@@ -16,10 +16,27 @@ export default function Companies() {
   const load = async () => {
     try {
       setLoading(true)
-      const [c, f] = await Promise.all([fetchCompanies(), fetchFloors()])
-      setCompanies(c)
-      setFloors(f)
+      const [companiesResponse, floorsResponse] = await Promise.all([fetchCompanies(), fetchFloors()])
+      
+      console.log('Companies response:', companiesResponse)
+      console.log('Floors response:', floorsResponse)
+      
+      // Handle different possible response structures
+      const companiesData = Array.isArray(companiesResponse) 
+        ? companiesResponse 
+        : companiesResponse?.data || companiesResponse?.message || []
+        
+      const floorsData = Array.isArray(floorsResponse) 
+        ? floorsResponse 
+        : floorsResponse?.data || floorsResponse?.message || []
+      
+      setCompanies(companiesData)
+      setFloors(floorsData)
+      
+      console.log('Set companies:', companiesData)
+      console.log('Set floors:', floorsData)
     } catch (e) {
+      console.error('Load error:', e)
       setError(e.message)
     } finally {
       setLoading(false)
@@ -54,6 +71,10 @@ export default function Companies() {
     try { await deleteCompany(id); await load() } catch (e) { setError(e.message) }
   }
 
+  // Add safety checks for arrays
+  const companiesArray = Array.isArray(companies) ? companies : []
+  const floorsArray = Array.isArray(floors) ? floors : []
+
   return (
     <div className='space-y-8'>
       {/* Header */}
@@ -79,7 +100,7 @@ export default function Companies() {
           <div className='flex items-center justify-between'>
             <div>
               <p className='text-blue-100 text-sm font-medium'>Total Companies</p>
-              <p className='text-3xl font-bold'>{companies.length}</p>
+              <p className='text-3xl font-bold'>{companiesArray.length}</p>
             </div>
             <div className='w-12 h-12 bg-blue-400 rounded-lg flex items-center justify-center'>
               <svg className='w-6 h-6' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
@@ -93,7 +114,7 @@ export default function Companies() {
           <div className='flex items-center justify-between'>
             <div>
               <p className='text-green-100 text-sm font-medium'>Available Floors</p>
-              <p className='text-3xl font-bold'>{floors.length}</p>
+              <p className='text-3xl font-bold'>{floorsArray.length}</p>
             </div>
             <div className='w-12 h-12 bg-green-400 rounded-lg flex items-center justify-center'>
               <svg className='w-6 h-6' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
@@ -107,7 +128,7 @@ export default function Companies() {
           <div className='flex items-center justify-between'>
             <div>
               <p className='text-purple-100 text-sm font-medium'>Assignments</p>
-              <p className='text-3xl font-bold'>{companies.filter(c => c.floor).length}</p>
+              <p className='text-3xl font-bold'>{companiesArray.filter(c => c.floor).length}</p>
             </div>
             <div className='w-12 h-12 bg-purple-400 rounded-lg flex items-center justify-center'>
               <svg className='w-6 h-6' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
@@ -152,16 +173,16 @@ export default function Companies() {
                 </tr>
               </thead>
               <tbody className='bg-white divide-y divide-gray-200'>
-                {companies.map((company, index) => (
+                {companiesArray.map((company, index) => (
                   <tr key={company._id} className={`hover:bg-gray-50 transition-colors duration-150 ${index % 2 === 0 ? 'bg-white' : 'bg-gray-50'}`}>
                     <td className='px-6 py-4 whitespace-nowrap'>
                       <div className='flex items-center'>
                         <div className='w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center mr-3'>
-                          <span className='text-blue-600 font-semibold text-sm'>{company.name.charAt(0)}</span>
+                          <span className='text-blue-600 font-semibold text-sm'>{company.name?.charAt(0) || 'C'}</span>
                         </div>
                         <div>
                           <div className='text-sm font-medium text-gray-900'>{company.name}</div>
-                          <div className='text-sm text-gray-500'>ID: {company._id.slice(-8)}</div>
+                          <div className='text-sm text-gray-500'>ID: {company._id?.slice(-8)}</div>
                         </div>
                       </div>
                     </td>
@@ -200,6 +221,16 @@ export default function Companies() {
                 ))}
               </tbody>
             </table>
+            
+            {companiesArray.length === 0 && !loading && (
+              <div className='text-center py-12'>
+                <svg className='w-12 h-12 text-gray-400 mx-auto mb-4' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
+                  <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4' />
+                </svg>
+                <h3 className='text-lg font-medium text-gray-900 mb-1'>No companies found</h3>
+                <p className='text-gray-500'>Get started by adding your first company.</p>
+              </div>
+            )}
           </div>
         </div>
       )}
@@ -227,7 +258,7 @@ export default function Companies() {
                   onChange={e => setAssignForm(v => ({ ...v, companyId: e.target.value }))} 
                   className='w-full rounded-lg border border-gray-300 px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500'
                 >
-                  {companies.map(c => <option key={c._id} value={c._id}>{c.name}</option>)}
+                  {companiesArray.map(c => <option key={c._id} value={c._id}>{c.name}</option>)}
                 </select>
               </div>
               <div>
@@ -238,7 +269,7 @@ export default function Companies() {
                   className='w-full rounded-lg border border-gray-300 px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500'
                 >
                   <option value=''>Select floor</option>
-                  {floors.map(f => <option key={f._id} value={f._id}>Floor {f.floorNumber}</option>)}
+                  {floorsArray.map(f => <option key={f._id} value={f._id}>Floor {f.floorNumber}</option>)}
                 </select>
               </div>
             </div>
@@ -310,5 +341,3 @@ export default function Companies() {
     </div>
   )
 }
-
-
