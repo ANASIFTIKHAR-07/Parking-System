@@ -29,7 +29,8 @@ export async function httpRequest(path, { method = 'GET', body, headers = {}, qu
     throw new Error(message);
   }
 
-  return data?.data !== undefined ? data.data : data;
+  // Return the full response data instead of extracting data.data
+  return data;
 }
 
 export const http = {
@@ -38,5 +39,3 @@ export const http = {
   put: (path, body, options) => httpRequest(path, { ...options, method: 'PUT', body }),
   del: (path, options) => httpRequest(path, { ...options, method: 'DELETE' }),
 };
-
-
