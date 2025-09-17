@@ -26,13 +26,13 @@ export default function ProtectedRoute() {
   }
   
   // RBAC: require role admin where available
-  if (admin?.role && admin.role !== 'ADMIN') {
+  if (admin?.role && admin.role !== 'admin') {
     console.log('ProtectedRoute: Invalid role, redirecting to home')
     return <Navigate to='/' replace />
   }
   
   console.log('ProtectedRoute: Access granted, rendering outlet')
-  return <Outlet />
+  return <Outlet /> 
 }
 
 

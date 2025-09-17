@@ -12,9 +12,10 @@ export function AuthProvider({ children }) {
     const checkAuth = async () => {
       try { 
         setLoading(true)
-        const me = await auth.me()
-        console.log('Auth check successful:', me)
-        setAdmin(me)
+        const response = await auth.me()
+        console.log('Auth check successful:', response.data)
+        // Assuming your me endpoint returns similar structure
+        setAdmin(response.data?.message?.loggedInAdmin || response.data?.data || null)
       } catch (error) {
         console.log('No existing session:', error.message)
         setAdmin(null)
@@ -30,11 +31,25 @@ export function AuthProvider({ children }) {
       setLoading(true)
       setError('')
       console.log('AuthContext: Starting login process')
-      const data = await auth.login(credentials)
-      console.log('AuthContext: Login API response:', data)
-      setAdmin(data?.loggedInAdmin || null)
-      console.log('AuthContext: Admin state set to:', data?.loggedInAdmin)
-      return data
+      const response = await auth.login(credentials)
+      console.log('AuthContext: Login API response:', response.data)
+      
+      // Extract the admin data from the response structure
+      const adminData = response.data?.message?.loggedInAdmin
+      const accessToken = response.data?.message?.accessToken
+      const refreshToken = response.data?.message?.refreshToken
+      
+      setAdmin(adminData || null)
+      
+      if (accessToken) {
+        localStorage.setItem('token', accessToken)
+      }
+      if (refreshToken) {
+        localStorage.setItem('refreshToken', refreshToken)
+      }
+      
+      console.log('AuthContext: Admin state set to:', adminData)
+      return response.data
     } catch (error) {
       console.error('AuthContext: Login error:', error)
       setError(error.message)
@@ -51,6 +66,8 @@ export function AuthProvider({ children }) {
       console.error('Logout error:', error)
     } finally {
       setAdmin(null)
+      localStorage.removeItem('token')
+      localStorage.removeItem('refreshToken')
     }
   }
 
@@ -75,5 +92,3 @@ export default function useAuth() {
   }
   return context
 }
-
-
