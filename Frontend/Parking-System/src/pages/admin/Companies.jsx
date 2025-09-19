@@ -41,6 +41,22 @@ export default function Companies() {
       
       console.log('Set companies:', companiesData)
       console.log('Set floors:', floorsData)
+      
+      // Debug the structure of the first company if it exists
+      if (companiesData && companiesData.length > 0) {
+        console.log('First company structure:', companiesData[0])
+        console.log('First company keys:', Object.keys(companiesData[0]))
+        console.log('assignedFloors:', companiesData[0].assignedFloors)
+        console.log('floor:', companiesData[0].floor)
+      }
+      
+      // Debug the structure of the first company if it exists
+      if (companiesData && companiesData.length > 0) {
+        console.log('First company structure:', companiesData[0])
+        console.log('First company keys:', Object.keys(companiesData[0]))
+        console.log('assignedFloors:', companiesData[0].assignedFloors)
+        console.log('floor:', companiesData[0].floor)
+      }
     } catch (e) {
       console.error('Load error:', e)
       setError(e.message)
@@ -93,20 +109,32 @@ export default function Companies() {
       
       setAssignForm({ companyId: '', floorId: '' })
       await load()
-    } catch (e) { 
+    } catch (error) { 
       console.error('=== ASSIGNMENT ERROR ===')
-      console.error('Full error object:', e)
-      console.error('Error response:', e.response?.data)
-      console.error('Error status:', e.response?.status)
+      console.error('Error type:', typeof error)
+      console.error('Error constructor:', error.constructor.name)
+      console.error('Error message:', error.message)
+      console.error('Full error object:', error)
+      console.error('Error.response exists:', !!error.response)
+      
+      if (error.response) {
+        console.error('Response data:', error.response.data)
+        console.error('Response status:', error.response.status)
+        console.error('Response headers:', error.response.headers)
+      } else if (error.request) {
+        console.error('Request was made but no response received:', error.request)
+      } else {
+        console.error('Error setting up request:', error.message)
+      }
       
       // Show a more helpful error message
       let errorMessage = 'Assignment failed'
-      if (e.response?.data?.message) {
-        errorMessage = e.response.data.message
-      } else if (e.response?.data?.error) {
-        errorMessage = e.response.data.error
-      } else if (e.message) {
-        errorMessage = e.message
+      if (error.response?.data?.message) {
+        errorMessage = error.response.data.message
+      } else if (error.response?.data?.error) {
+        errorMessage = error.response.data.error
+      } else if (error.message) {
+        errorMessage = error.message
       }
       
       setError(errorMessage)
@@ -190,7 +218,7 @@ export default function Companies() {
             <div className='flex items-center justify-between'>
               <div className="space-y-2">
                 <p className='text-purple-100 text-sm font-medium uppercase tracking-wider'>Assignments</p>
-                <p className='text-4xl font-bold'>{companiesArray.filter(c => c.floor).length}</p>
+                <p className='text-4xl font-bold'>{companiesArray.filter(c => (c.assignedFloors && c.assignedFloors.length > 0) || c.floor).length}</p>
               </div>
               <div className='w-16 h-16 bg-white/20 backdrop-blur-sm rounded-2xl flex items-center justify-center'>
                 <svg className='w-8 h-8' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
@@ -262,7 +290,15 @@ export default function Companies() {
                         </div>
                       </td>
                       <td className='px-8 py-6'>
-                        {company.floor ? (
+                        {company.assignedFloors && company.assignedFloors.length > 0 ? (
+                          <div className="space-y-1">
+                            {company.assignedFloors.map((floor, idx) => (
+                              <span key={floor._id || idx} className='inline-flex items-center px-4 py-2 rounded-2xl text-sm font-bold bg-gradient-to-r from-green-500 to-emerald-600 text-white shadow-lg mr-2 mb-1'>
+                                Floor {floor.floorNumber || floor}
+                              </span>
+                            ))}
+                          </div>
+                        ) : company.floor ? (
                           <span className='inline-flex items-center px-4 py-2 rounded-2xl text-sm font-bold bg-gradient-to-r from-green-500 to-emerald-600 text-white shadow-lg'>
                             Floor {company.floor.floorNumber}
                           </span>
@@ -275,10 +311,13 @@ export default function Companies() {
                       <td className='px-8 py-6'>
                         <div className='flex items-center justify-end space-x-3'>
                           <button
-                            onClick={() => setAssignForm({ companyId: company._id, floorId: company.floor?._id || '' })}
+                            onClick={() => {
+                              const currentFloorId = company.assignedFloors?.[0]?._id || company.assignedFloors?.[0] || company.floor?._id || '';
+                              setAssignForm({ companyId: company._id, floorId: currentFloorId });
+                            }}
                             className='px-4 py-2 rounded-xl text-sm font-semibold bg-gradient-to-r from-blue-500 to-purple-600 text-white hover:from-blue-600 hover:to-purple-700 transition-all duration-200 shadow-lg hover:shadow-xl transform hover:scale-105'
                           >
-                            Assign Floor
+                            {(company.assignedFloors && company.assignedFloors.length > 0) || company.floor ? 'Reassign Floor' : 'Assign Floor'}
                           </button>
                           <button
                             onClick={() => remove(company._id)}

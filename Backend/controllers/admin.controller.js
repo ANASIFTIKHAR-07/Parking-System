@@ -31,7 +31,9 @@ const addCompany = asyncHandler(async (req, res) => {
 });
 
 const getAllCompanies = asyncHandler(async (req, res) => {
-  const companies = await Company.find().sort({ createdAt: -1 });
+  const companies = await Company.find()
+    .populate('assignedFloors', 'floorNumber') // Add this line
+    .sort({ createdAt: -1 });
 
   return res
     .status(200)
