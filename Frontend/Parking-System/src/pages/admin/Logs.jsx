@@ -12,16 +12,50 @@ export default function Logs() {
   const [filters, setFilters] = useState({ companyId: '', floorId: '', assigned: '' })
 
   const loadMeta = async () => {
-    try { const [c, f] = await Promise.all([fetchCompanies(), fetchFloors()]); setCompanies(c); setFloors(f) } catch (e) { setError(e.message) }
+    try { 
+      const [companiesResponse, floorsResponse] = await Promise.all([fetchCompanies(), fetchFloors()])
+      
+      console.log('Companies response:', companiesResponse)
+      console.log('Floors response:', floorsResponse)
+      
+      // Handle different possible response structures
+      const companiesData = Array.isArray(companiesResponse) 
+        ? companiesResponse 
+        : companiesResponse?.data || companiesResponse?.companies || companiesResponse?.message || []
+        
+      const floorsData = Array.isArray(floorsResponse) 
+        ? floorsResponse 
+        : floorsResponse?.data || floorsResponse?.floors || floorsResponse?.message || []
+      
+      setCompanies(companiesData)
+      setFloors(floorsData)
+    } catch (e) { 
+      console.error('Load meta error:', e)
+      setError(e.message) 
+    }
   }
+
   const load = async () => {
     try { 
       setLoading(true)
-      setSlots(await fetchParkingSlots(filters)) 
-    } catch (e) { setError(e.message) } finally {
+      const response = await fetchParkingSlots(filters)
+      
+      console.log('Slots response:', response)
+      
+      // Handle different possible response structures
+      const slotsData = Array.isArray(response) 
+        ? response 
+        : response?.data || response?.slots || response?.message || []
+      
+      setSlots(slotsData) 
+    } catch (e) { 
+      console.error('Load slots error:', e)
+      setError(e.message) 
+    } finally {
       setLoading(false)
     }
   }
+
   useEffect(() => { loadMeta() }, [])
   useEffect(() => { load() }, [filters.companyId, filters.floorId, filters.assigned])
 
@@ -34,9 +68,14 @@ export default function Logs() {
     window.location.href = url.toString()
   }
 
-  const assignedSlots = slots.filter(s => s.employee).length
-  const availableSlots = slots.filter(s => !s.employee).length
-  const totalSlots = slots.length
+  // Add safety checks to ensure arrays
+  const slotsArray = Array.isArray(slots) ? slots : []
+  const companiesArray = Array.isArray(companies) ? companies : []
+  const floorsArray = Array.isArray(floors) ? floors : []
+
+  const assignedSlots = slotsArray.filter(s => s.employee && s.employee !== null).length
+  const availableSlots = slotsArray.filter(s => !s.employee || s.employee === null).length
+  const totalSlots = slotsArray.length
 
   return (
     <div className='space-y-8'>
@@ -128,7 +167,7 @@ export default function Logs() {
               onChange={e => setFilters(v => ({ ...v, companyId: e.target.value }))}
             >
               <option value=''>All Companies</option>
-              {companies.map(c => <option key={c._id} value={c._id}>{c.name}</option>)}
+              {companiesArray.map(c => <option key={c._id} value={c._id}>{c.name}</option>)}
             </select>
           </div>
           <div>
@@ -139,7 +178,7 @@ export default function Logs() {
               onChange={e => setFilters(v => ({ ...v, floorId: e.target.value }))}
             >
               <option value=''>All Floors</option>
-              {floors.map(f => <option key={f._id} value={f._id}>Floor {f.floorNumber}</option>)}
+              {floorsArray.map(f => <option key={f._id} value={f._id}>Floor {f.floorNumber}</option>)}
             </select>
           </div>
           <div>
@@ -210,7 +249,7 @@ export default function Logs() {
                 </tr>
               </thead>
               <tbody className='bg-white divide-y divide-gray-200'>
-                {slots.map((slot, index) => (
+                {slotsArray.map((slot, index) => (
                   <tr key={slot._id} className={`hover:bg-gray-50 transition-colors duration-150 ${index % 2 === 0 ? 'bg-white' : 'bg-gray-50'}`}>
                     <td className='px-6 py-4 whitespace-nowrap'>
                       <div className='flex items-center'>
@@ -255,7 +294,7 @@ export default function Logs() {
       )}
 
       {/* Empty State */}
-      {!loading && slots.length === 0 && (
+      {!loading && slotsArray.length === 0 && (
         <div className='text-center py-12'>
           <svg className='mx-auto h-12 w-12 text-gray-400' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
             <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z' />
@@ -267,5 +306,3 @@ export default function Logs() {
     </div>
   )
 }
-
-
