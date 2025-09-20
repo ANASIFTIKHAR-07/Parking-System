@@ -19,6 +19,7 @@ export const fetchParkingSlots = (query) => http.get('/admin/parking-slots', { q
 export const updateParkingSlot = (id, payload) => http.put(`/admin/parking-slot/${id}`, payload);
 export const deleteParkingSlot = (id) => http.del(`/admin/parking-slot/${id}`);
 
+
 // Logs
 export const fetchParkingLogs = (query) => http.get('/admin/parking-logs', { query });
 
