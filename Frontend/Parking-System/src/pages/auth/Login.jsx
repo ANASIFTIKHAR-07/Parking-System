@@ -28,54 +28,49 @@ export default function Login() {
   }
 
   return (
-    <div className='min-h-screen relative overflow-hidden bg-gradient-to-br from-blue-900 via-purple-900 to-indigo-900'>
-      {/* Animated Background Elements */}
-      <div className="absolute inset-0">
-        {/* Floating particles */}
-        <div className="absolute top-1/4 left-1/4 w-2 h-2 bg-white bg-opacity-20 rounded-full animate-bounce"></div>
-        <div className="absolute top-3/4 left-1/3 w-3 h-3 bg-blue-400 bg-opacity-30 rounded-full animate-bounce" style={{ animationDelay: '1s', animationDuration: '4s' }}></div>
-        <div className="absolute top-1/2 right-1/4 w-1 h-1 bg-purple-400 bg-opacity-40 rounded-full animate-bounce" style={{ animationDelay: '2s', animationDuration: '5s' }}></div>
-        <div className="absolute bottom-1/4 right-1/3 w-2 h-2 bg-indigo-400 bg-opacity-30 rounded-full animate-bounce" style={{ animationDelay: '0.5s', animationDuration: '3.5s' }}></div>
-        
-        {/* Gradient orbs */}
-        <div className="absolute top-20 right-20 w-64 h-64 bg-gradient-to-r from-blue-600 to-purple-600 opacity-20 rounded-full blur-3xl animate-pulse"></div>
-        <div className="absolute bottom-20 left-20 w-80 h-80 bg-gradient-to-r from-purple-600 to-indigo-600 opacity-15 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '1s' }}></div>
-      </div>
+    <div className='min-h-screen bg-gray-50'>
+      {/* Header - matching homepage header */}
+      <header className='bg-white shadow-sm border-b'>
+        <div className='max-w-7xl mx-auto px-4 sm:px-6 lg:px-8'>
+          <div className='flex items-center justify-between h-16'>
+            <Link to='/' className='flex items-center space-x-3 hover:opacity-80 transition-opacity'>
+              <div className='w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center'>
+                <span className='text-white font-bold text-sm'>P</span>
+              </div>
+              <h1 className='text-xl font-semibold text-gray-900'>Parking Management</h1>
+            </Link>
+            <Link to='/' className='text-gray-600 hover:text-gray-900 transition-colors'>
+              ← Back to Home
+            </Link>
+          </div>
+        </div>
+      </header>
 
-      <div className='relative z-10 min-h-screen flex items-center justify-center px-4 py-8'>
+      {/* Login Form Section */}
+      <div className='flex items-center justify-center px-4 py-16'>
         <div className='w-full max-w-md'>
           {/* Header */}
           <div className='text-center mb-8'>
-            <Link to='/' className='inline-flex items-center space-x-3 mb-8 group transition-all duration-300'>
-              <div className='w-12 h-12 bg-gradient-to-r from-blue-500 to-purple-600 rounded-2xl flex items-center justify-center shadow-lg transform group-hover:scale-110 group-hover:rotate-12 transition-all duration-300'>
-                <span className='text-white font-bold text-xl'>🅿️</span>
-              </div>
-              <h1 className='text-3xl font-bold text-white'>
-                Parking Management
-              </h1>
-            </Link>
-            <div className="space-y-2">
-              <h2 className='text-2xl font-bold text-white mb-2'>Welcome Back</h2>
-              <p className='text-blue-100 opacity-80'>Sign in to access your admin dashboard</p>
-            </div>
+            <h2 className='text-3xl font-bold text-gray-900 mb-2'>Welcome Back</h2>
+            <p className='text-gray-600'>Sign in to access your admin dashboard</p>
           </div>
 
           {/* Login Form Card */}
-          <div className='backdrop-blur-xl bg-white bg-opacity-10 rounded-3xl shadow-2xl border border-white border-opacity-20 p-8 transform transition-all duration-500 hover:bg-opacity-20'>
+          <div className='bg-white rounded-lg shadow-sm border p-8'>
             {/* Error Message */}
             {error && (
-              <div className='mb-6 p-4 bg-red-500 bg-opacity-20 border border-red-400 border-opacity-50 rounded-2xl flex items-center space-x-3'>
-                <svg className='w-5 h-5 text-red-300 flex-shrink-0' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
+              <div className='mb-6 p-4 bg-red-50 border border-red-200 rounded-lg flex items-center space-x-3'>
+                <svg className='w-5 h-5 text-red-500 flex-shrink-0' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
                   <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z' />
                 </svg>
-                <span className='text-red-200 text-sm'>{error}</span>
+                <span className='text-red-700 text-sm'>{error}</span>
               </div>
             )}
 
             {/* Form */}
             <form className='space-y-6' onSubmit={onSubmit}>
               <div className='space-y-5'>
-                <div className="transform hover:scale-105 transition-all duration-200">
+                <div>
                   <Input 
                     label='Email Address' 
                     type='email' 
@@ -83,10 +78,10 @@ export default function Login() {
                     onChange={e => setForm(v => ({ ...v, email: e.target.value }))} 
                     required 
                     placeholder='admin@example.com'
-                    className="[&>input]:bg-white [&>input]:bg-opacity-90 [&>input]:backdrop-blur-sm [&>input]:border-white [&>input]:border-opacity-30 [&>input]:rounded-xl [&>input]:transition-all [&>input]:duration-200 [&>label]:text-white [&>label]:font-medium"
+                    className="[&>input]:border-gray-300 [&>input]:rounded-lg [&>input]:focus:border-blue-500 [&>input]:focus:ring-blue-500 [&>label]:text-gray-700 [&>label]:font-medium [&>label]:text-sm"
                   />
                 </div>
-                <div className="transform hover:scale-105 transition-all duration-200">
+                <div>
                   <Input 
                     label='Password' 
                     type='password' 
@@ -94,7 +89,7 @@ export default function Login() {
                     onChange={e => setForm(v => ({ ...v, password: e.target.value }))} 
                     required 
                     placeholder='Enter your password'
-                    className="[&>input]:bg-white [&>input]:bg-opacity-90 [&>input]:backdrop-blur-sm [&>input]:border-white [&>input]:border-opacity-30 [&>input]:rounded-xl [&>input]:transition-all [&>input]:duration-200 [&>label]:text-white [&>label]:font-medium"
+                    className="[&>input]:border-gray-300 [&>input]:rounded-lg [&>input]:focus:border-blue-500 [&>input]:focus:ring-blue-500 [&>label]:text-gray-700 [&>label]:font-medium [&>label]:text-sm"
                   />
                 </div>
               </div>
@@ -103,7 +98,7 @@ export default function Login() {
               <Button 
                 type='submit' 
                 disabled={loading}
-                className='w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white py-4 rounded-2xl font-semibold shadow-xl hover:shadow-2xl transform hover:scale-105 transition-all duration-300 border-0'
+                className='w-full bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-lg font-medium shadow-sm hover:shadow-md transition-all duration-200 border-0'
                 size="large"
               >
                 {loading ? (
@@ -114,7 +109,7 @@ export default function Login() {
                 ) : (
                   <div className="flex items-center justify-center space-x-2">
                     <span>Sign In</span>
-                    <svg className="w-5 h-5 transform group-hover:translate-x-1 transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
                     </svg>
                   </div>
@@ -122,32 +117,31 @@ export default function Login() {
               </Button>
             </form>
 
-            {/* Back to Home Link */}
-            <div className='mt-8 text-center'>
-              <Link 
-                to='/' 
-                className='inline-flex items-center space-x-2 text-sm text-blue-100 opacity-80 hover:text-white hover:opacity-100 transition-all duration-200 group'
-              >
-                <svg className="w-4 h-4 transform group-hover:-translate-x-1 transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
-                </svg>
-                <span>Back to Home</span>
-              </Link>
+            {/* Additional Options */}
+            <div className='mt-6 text-center'>
+              <p className='text-sm text-gray-500'>
+                Need help? Contact your system administrator
+              </p>
             </div>
-
-            {/* Decorative Elements */}
-            <div className="absolute -top-2 -right-2 w-4 h-4 bg-gradient-to-r from-blue-400 to-purple-400 rounded-full opacity-60 animate-ping"></div>
-            <div className="absolute -bottom-2 -left-2 w-3 h-3 bg-gradient-to-r from-purple-400 to-indigo-400 rounded-full opacity-40 animate-pulse"></div>
           </div>
 
-          {/* Footer */}
-          <div className="mt-8 text-center">
-            <p className="text-blue-100 opacity-60 text-xs">
-              Secure • Fast • Reliable
+          {/* Security Notice */}
+          <div className="mt-6 text-center">
+            <p className="text-xs text-gray-500">
+              🔒 Your connection is secure and encrypted
             </p>
           </div>
         </div>
       </div>
+
+      {/* Footer - matching homepage footer */}
+      <footer className='bg-gray-900 text-white py-8 mt-auto'>
+        <div className='max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center'>
+          <p className='text-gray-400'>
+            © 2024 Parking Management System. All rights reserved.
+          </p>
+        </div>
+      </footer>
     </div>
   )
 }
