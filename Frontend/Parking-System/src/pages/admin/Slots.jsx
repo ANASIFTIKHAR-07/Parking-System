@@ -53,6 +53,10 @@ export default function Slots() {
       
       const response = await fetchParkingSlots(queryParams)
       
+      // Debug: Log first slot and floors to understand structure
+      console.log('First slot company:', response?.[0]?.company)
+      console.log('Available floors structure:', floorsArray)
+      
       // Handle different possible response structures
       const slotsData = Array.isArray(response) 
         ? response 
