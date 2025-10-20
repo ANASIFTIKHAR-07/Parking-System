@@ -28,7 +28,6 @@ export async function httpRequest(path, { method = 'GET', body, headers = {}, qu
     const message = isJSON ? (data?.message || data?.error || 'Request failed') : data;
     throw new Error(message);
   }
-
   // Return the full response data instead of extracting data.data
   return data;
 }
